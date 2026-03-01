@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Вечерний отчёт</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 16px;
+            color: #1c1e21;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .card {
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        h2 {
+            margin-top: 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: #1c1e21;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 500;
+            color: #444;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dadde1;
+            border-radius: 8px;
+            font-size: 16px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+            background-color: #fff;
+        }
+        textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        button {
+            background-color: #0088cc;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: 600;
+            width: 100%;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #0077b5;
+        }
+        .button-secondary {
+            background-color: #e4e6eb;
+            color: #1c1e21;
+            margin-top: 8px;
+        }
+        .button-secondary:hover {
+            background-color: #d8dadf;
+        }
+        .material-row {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-left: 4px solid #0088cc;
+        }
+        .remove-material {
+            background-color: #ff4d4f;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 12px;
+            font-size: 14px;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+        .remove-material:hover {
+            background-color: #ff7875;
+        }
+        .status {
+            text-align: center;
+            margin-top: 20px;
+            color: #28a745;
+            font-weight: 500;
+        }
+        .error {
+            color: #dc3545;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h2>📝 Вечерний отчёт</h2>
+            <p>Заполни форму, братан, и нажми «Отправить». Данные улетят боту, а он их разложит по полочкам.</p>
+
+            <form id="reportForm">
+                <!-- Бригада -->
+                <label for="brigade">Бригада</label>
+                <select id="brigade" name="brigade" required>
+                    <option value="">Выбери бригаду</option>
+                    <option value="Теплотрасса">Теплотрасса</option>
+                    <option value="Отделочники">Отделочники</option>
+                    <option value="Котельные">Котельные</option>
+                    <option value="Фасад">Фасад</option>
+                </select>
+
+                <!-- Объект -->
+                <label for="object">Объект</label>
+                <select id="object" name="object" required>
+                    <option value="">Выбери объект</option>
+                    <option value="Теплотрасса">Теплотрасса</option>
+                    <option value="ул. Ленина 5">ул. Ленина 5</option>
+                    <option value="Котельная №2">Котельная №2</option>
+                    <option value="База Бровки">База Бровки</option>
+                </select>
+
+                <!-- Текст отчёта -->
+                <label for="text">Что сделали за смену?</label>
+                <textarea id="text" name="text" required placeholder="Например: залили стяжку, оштукатурили стены..."></textarea>
+
+                <!-- Скрытые работы -->
+                <label for="hidden">Были скрытые работы?</label>
+                <select id="hidden" name="hidden" required>
+                    <option value="Нет">Нет</option>
+                    <option value="Да">Да</option>
+                </select>
+
+                <!-- Фото (можно несколько) -->
+                <label for="photos">Фото (можно выбрать несколько)</label>
+                <input type="file" id="photos" name="photos" accept="image/*" multiple>
+
+                <!-- Материалы -->
+                <h3>📦 Расход материалов</h3>
+                <div id="materials-container">
+                    <!-- Сюда будут добавляться строки -->
+                </div>
+                <button type="button" id="add-material" class="button-secondary">➕ Добавить материал</button>
+
+                <!-- Кнопка отправки -->
+                <button type="submit" id="submit-btn">🚀 Отправить отчёт</button>
+            </form>
+            <div id="status" class="status"></div>
+        </div>
+    </div>
+
+    <script src="config.js"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+        tg.expand();
+
+        const form = document.getElementById('reportForm');
+        const materialsContainer = document.getElementById('materials-container');
+        const addMaterialBtn = document.getElementById('add-material');
+        const submitBtn = document.getElementById('submit-btn');
+        const statusDiv = document.getElementById('status');
+
+        let materialCounter = 0;
+
+        function addMaterialRow(name = '', qty = '') {
+            materialCounter++;
+            const rowId = `material-${materialCounter}`;
+            const div = document.createElement('div');
+            div.className = 'material-row';
+            div.id = rowId;
+            div.innerHTML = `
+                <label>Название материала</label>
+                <input type="text" class="material-name" placeholder="например, Цемент" value="${name}">
+                <label>Количество</label>
+                <input type="number" step="0.1" class="material-qty" placeholder="например, 10" value="${qty}">
+                <button type="button" class="remove-material" onclick="removeMaterial('${rowId}')">❌ Удалить</button>
+            `;
+            materialsContainer.appendChild(div);
+        }
+
+        window.removeMaterial = function(id) {
+            const el = document.getElementById(id);
+            if (el) el.remove();
+        };
+
+        addMaterialBtn.addEventListener('click', () => addMaterialRow());
+        addMaterialRow(); // одна строка по умолчанию
+
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            statusDiv.textContent = '⏳ Отправка...';
+            submitBtn.disabled = true;
+
+            const brigade = document.getElementById('brigade').value;
+            const object = document.getElementById('object').value;
+            const text = document.getElementById('text').value;
+            const hidden = document.getElementById('hidden').value;
+
+            const materials = [];
+            document.querySelectorAll('.material-row').forEach(row => {
+                const name = row.querySelector('.material-name')?.value.trim();
+                const qty = row.querySelector('.material-qty')?.value.trim();
+                if (name && qty) {
+                    materials.push({ name, qty: parseFloat(qty) });
+                }
+            });
+
+            if (!brigade || !object || !text) {
+                statusDiv.innerHTML = '<span class="error">❌ Заполни бригаду, объект и текст!</span>';
+                submitBtn.disabled = false;
+                return;
+            }
+
+            const reportData = {
+                brigade,
+                object,
+                text,
+                hidden: hidden === 'Да',
+                materials: materials,
+            };
+
+            const jsonData = JSON.stringify(reportData);
+            console.log('Отправляемые данные:', jsonData);
+
+            if (jsonData.length > 4096) {
+                statusDiv.innerHTML = '<span class="error">❌ Слишком много данных! Уменьши количество материалов.</span>';
+                submitBtn.disabled = false;
+                return;
+            }
+
+            tg.sendData(jsonData);
+            tg.close();
+        });
+    </script>
+</body>
+</html>
