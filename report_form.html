@@ -104,13 +104,19 @@
         .error {
             color: #dc3545;
         }
+        .warning {
+            color: #ff9800;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="card">
             <h2>📝 Вечерний отчёт</h2>
-            <p>Заполни форму, братан, и нажми «Отправить». Данные улетят боту, а он их разложит по полочкам.</p>
+            <div id="tg-check" style="margin-bottom: 10px; padding: 8px; background-color: #ffeeba; border-radius: 4px; display: none;">
+                ⚠️ Запущено не в Telegram. Данные не отправятся.
+            </div>
+            <p>Заполни форму, братан, и нажми «Отправить».</p>
 
             <form id="reportForm">
                 <!-- Бригада -->
@@ -144,8 +150,8 @@
                     <option value="Да">Да</option>
                 </select>
 
-                <!-- Фото (можно несколько) -->
-                <label for="photos">Фото (можно выбрать несколько)</label>
+                <!-- Фото (можно несколько) – пока просто заглушка -->
+                <label for="photos">Фото (можно выбрать несколько, но пока не отправляются)</label>
                 <input type="file" id="photos" name="photos" accept="image/*" multiple>
 
                 <!-- Материалы -->
@@ -165,9 +171,17 @@
     <script src="config.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.ready();
-        tg.expand();
+        // Проверка, запущено ли в Telegram
+        const tg = window.Telegram?.WebApp;
+        const tgCheck = document.getElementById('tg-check');
+        if (!tg) {
+            tgCheck.style.display = 'block';
+            console.error('Telegram WebApp не доступен');
+        } else {
+            tg.ready();
+            tg.expand();
+            console.log('Telegram WebApp инициализирован');
+        }
 
         const form = document.getElementById('reportForm');
         const materialsContainer = document.getElementById('materials-container');
@@ -199,10 +213,17 @@
         };
 
         addMaterialBtn.addEventListener('click', () => addMaterialRow());
-        addMaterialRow(); // одна строка по умолчанию
+        // Одна строка по умолчанию
+        addMaterialRow();
 
         form.addEventListener('submit', function(e) {
             e.preventDefault();
+            statusDiv.innerHTML = '';
+            if (!tg) {
+                statusDiv.innerHTML = '<span class="error">❌ Не в Telegram</span>';
+                return;
+            }
+
             statusDiv.textContent = '⏳ Отправка...';
             submitBtn.disabled = true;
 
@@ -243,8 +264,15 @@
                 return;
             }
 
-            tg.sendData(jsonData);
-            tg.close();
+            try {
+                tg.sendData(jsonData);
+                statusDiv.innerHTML = '<span class="status">✅ Данные отправлены! Закрываю форму...</span>';
+                setTimeout(() => tg.close(), 500);
+            } catch (err) {
+                console.error('Ошибка при отправке:', err);
+                statusDiv.innerHTML = '<span class="error">❌ Ошибка отправки</span>';
+                submitBtn.disabled = false;
+            }
         });
     </script>
 </body>
