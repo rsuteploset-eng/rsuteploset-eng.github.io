@@ -104,9 +104,6 @@
         .error {
             color: #dc3545;
         }
-        .warning {
-            color: #ff9800;
-        }
     </style>
 </head>
 <body>
@@ -150,10 +147,6 @@
                     <option value="Да">Да</option>
                 </select>
 
-                <!-- Фото (можно несколько) – пока просто заглушка -->
-                <label for="photos">Фото (можно выбрать несколько, но пока не отправляются)</label>
-                <input type="file" id="photos" name="photos" accept="image/*" multiple>
-
                 <!-- Материалы -->
                 <h3>📦 Расход материалов</h3>
                 <div id="materials-container">
@@ -171,7 +164,6 @@
     <script src="config.js"></script>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        // Проверка, запущено ли в Telegram
         const tg = window.Telegram?.WebApp;
         const tgCheck = document.getElementById('tg-check');
         if (!tg) {
