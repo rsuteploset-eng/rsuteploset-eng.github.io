@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Тест Web App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+    <h1>Тест Web App</h1>
+    <p>Если ты это видишь, скрипт загружен.</p>
+    <button onclick="sendTest()">Отправить тест</button>
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+
+        function sendTest() {
+            tg.sendData(JSON.stringify({ test: 'Привет от Web App!' }));
+            tg.close();
+        }
+
+        // Отправим автоматически через 2 секунды (для проверки)
+        setTimeout(() => {
+            tg.sendData(JSON.stringify({ test: 'Авто-привет!' }));
+            tg.close();
+        }, 2000);
+    </script>
+</body>
+</html>
