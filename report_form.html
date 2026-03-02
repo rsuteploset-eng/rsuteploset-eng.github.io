@@ -1,271 +1,617 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Вечерний отчёт</title>
-    <style>
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: #f0f2f5;
-            margin: 0;
-            padding: 16px;
-            color: #1c1e21;
-        }
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-        }
-        .card {
-            background-color: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            padding: 20px;
-            margin-bottom: 16px;
-        }
-        h2 {
-            margin-top: 0;
-            font-size: 20px;
-            font-weight: 600;
-            color: #1c1e21;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        label {
-            display: block;
-            margin-bottom: 6px;
-            font-weight: 500;
-            color: #444;
-        }
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #dadde1;
-            border-radius: 8px;
-            font-size: 16px;
-            margin-bottom: 16px;
-            box-sizing: border-box;
-            background-color: #fff;
-        }
-        textarea {
-            min-height: 80px;
-            resize: vertical;
-        }
-        button {
-            background-color: #0088cc;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 14px;
-            font-size: 16px;
-            font-weight: 600;
-            width: 100%;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        button:hover {
-            background-color: #0077b5;
-        }
-        .button-secondary {
-            background-color: #e4e6eb;
-            color: #1c1e21;
-            margin-top: 8px;
-        }
-        .button-secondary:hover {
-            background-color: #d8dadf;
-        }
-        .material-row {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 16px;
-            margin-bottom: 12px;
-            border-left: 4px solid #0088cc;
-        }
-        .remove-material {
-            background-color: #ff4d4f;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            padding: 8px 12px;
-            font-size: 14px;
-            margin-top: 8px;
-            cursor: pointer;
-        }
-        .remove-material:hover {
-            background-color: #ff7875;
-        }
-        .status {
-            text-align: center;
-            margin-top: 20px;
-            color: #28a745;
-            font-weight: 500;
-        }
-        .error {
-            color: #dc3545;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Вечерний отчёт РСУ</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: #f4f4f4;
+      color: #222;
+    }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.08);
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 18px;
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .hidden {
+      display: none;
+    }
+    .item {
+      border: 1px dashed #bbb;
+      border-radius: 10px;
+      padding: 10px;
+      margin-top: 10px;
+      background: #fafafa;
+    }
+    .btn-secondary {
+      margin-top: 10px;
+      background: #ececec;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-danger {
+      margin-top: 10px;
+      background: #ffdede;
+      border: none;
+      cursor: pointer;
+    }
+    .submit-btn {
+      background: #2f7cff;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .small {
+      font-size: 12px;
+      color: #666;
+      margin-top: 4px;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="card">
-            <h2>📝 Вечерний отчёт</h2>
-            <div id="tg-check" style="margin-bottom: 10px; padding: 8px; background-color: #ffeeba; border-radius: 4px; display: none;">
-                ⚠️ Запущено не в Telegram. Данные не отправятся.
-            </div>
-            <p>Заполни форму, братан, и нажми «Отправить».</p>
+  <form id="reportForm">
+    <div class="card">
+      <h2>Шапка отчёта</h2>
 
-            <form id="reportForm">
-                <!-- Бригада -->
-                <label for="brigade">Бригада</label>
-                <select id="brigade" name="brigade" required>
-                    <option value="">Выбери бригаду</option>
-                    <option value="Теплотрасса">Теплотрасса</option>
-                    <option value="Отделочники">Отделочники</option>
-                    <option value="Котельные">Котельные</option>
-                    <option value="Фасад">Фасад</option>
-                </select>
+      <label for="brigade">Бригада</label>
+      <select id="brigade" required>
+        <option value="">Выбери бригаду</option>
+        <option>Теплотрасса</option>
+        <option>Отделочники</option>
+        <option>Котельные</option>
+        <option>Фасад</option>
+      </select>
 
-                <!-- Объект -->
-                <label for="object">Объект</label>
-                <select id="object" name="object" required>
-                    <option value="">Выбери объект</option>
-                    <option value="Теплотрасса">Теплотрасса</option>
-                    <option value="ул. Ленина 5">ул. Ленина 5</option>
-                    <option value="Котельная №2">Котельная №2</option>
-                    <option value="База Бровки">База Бровки</option>
-                </select>
+      <label for="objectName">Объект</label>
+      <select id="objectName" required>
+        <option value="">Выбери объект</option>
+      </select>
 
-                <!-- Текст отчёта -->
-                <label for="text">Что сделали за смену?</label>
-                <textarea id="text" name="text" required placeholder="Например: залили стяжку, оштукатурили стены..."></textarea>
-
-                <!-- Скрытые работы -->
-                <label for="hidden">Были скрытые работы?</label>
-                <select id="hidden" name="hidden" required>
-                    <option value="Нет">Нет</option>
-                    <option value="Да">Да</option>
-                </select>
-
-                <!-- Материалы -->
-                <h3>📦 Расход материалов</h3>
-                <div id="materials-container">
-                    <!-- Сюда будут добавляться строки -->
-                </div>
-                <button type="button" id="add-material" class="button-secondary">➕ Добавить материал</button>
-
-                <!-- Кнопка отправки -->
-                <button type="submit" id="submit-btn">🚀 Отправить отчёт</button>
-            </form>
-            <div id="status" class="status"></div>
+      <div class="row">
+        <div>
+          <label for="reportDate">Дата</label>
+          <input type="date" id="reportDate" required />
         </div>
+        <div>
+          <label for="workersCount">Сколько человек было в работе</label>
+          <input type="number" id="workersCount" min="1" required />
+        </div>
+      </div>
+
+      <label for="fullTeam">Полный состав?</label>
+      <select id="fullTeam" required>
+        <option value="yes">Да</option>
+        <option value="no">Нет</option>
+      </select>
+
+      <div id="absenceBlock" class="hidden">
+        <label for="absentPeople">Кто отсутствовал</label>
+        <input type="text" id="absentPeople" placeholder="Например: Иванов, Петров" />
+
+        <label for="absenceReason">Причина отсутствия</label>
+        <select id="absenceReason">
+          <option value="">Выбери причину</option>
+          <option>Больничный</option>
+          <option>Отпуск</option>
+          <option>Переведён на другой объект</option>
+          <option>Прогул</option>
+          <option>Другое</option>
+        </select>
+      </div>
     </div>
 
-    <script src="config.js"></script>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script>
-        const tg = window.Telegram?.WebApp;
-        const tgCheck = document.getElementById('tg-check');
-        if (!tg) {
-            tgCheck.style.display = 'block';
-            console.error('Telegram WebApp не доступен');
+    <div class="card">
+      <h2>Что сделали сегодня</h2>
+      <div id="worksContainer"></div>
+      <button type="button" class="btn-secondary" onclick="addWork()">+ Добавить выполненную работу</button>
+    </div>
+
+    <div class="card">
+      <h2>План на день</h2>
+
+      <label for="planStatus">План на сегодня закрыли?</label>
+      <select id="planStatus" required>
+        <option value="">Выбери статус</option>
+        <option value="yes">Да</option>
+        <option value="partial">Частично</option>
+        <option value="no">Нет</option>
+      </select>
+
+      <div id="planProblemsBlock" class="hidden">
+        <label for="unfinishedWork">Что не успели</label>
+        <textarea id="unfinishedWork"></textarea>
+
+        <label for="planIssueReason">Почему не закрыли план</label>
+        <select id="planIssueReason">
+          <option value="">Выбери причину</option>
+          <option>Не хватило людей</option>
+          <option>Не хватило материала</option>
+          <option>Не хватило инструмента</option>
+          <option>Погода</option>
+          <option>Не было доступа</option>
+          <option>Мешали смежники</option>
+          <option>Поломка</option>
+          <option>Появились доп. работы</option>
+          <option>Другое</option>
+        </select>
+
+        <label for="needTomorrow">Что нужно для продолжения завтра</label>
+        <textarea id="needTomorrow"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Материалы</h2>
+
+      <label for="usedMaterials">Материалы сегодня использовали?</label>
+      <select id="usedMaterials" required>
+        <option value="no">Нет</option>
+        <option value="yes">Да</option>
+      </select>
+
+      <div id="materialsBlock" class="hidden">
+        <div id="materialsContainer"></div>
+        <button type="button" class="btn-secondary" onclick="addMaterial()">+ Добавить материал</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Инструмент и техника</h2>
+
+      <label for="toolIssues">Были проблемы с инструментом/техникой?</label>
+      <select id="toolIssues" required>
+        <option value="no">Нет</option>
+        <option value="yes">Да</option>
+      </select>
+
+      <div id="toolIssuesBlock" class="hidden">
+        <label for="toolIssueType">Тип проблемы</label>
+        <select id="toolIssueType">
+          <option value="">Выбери тип</option>
+          <option>Поломка</option>
+          <option>Утеря</option>
+          <option>Не хватает</option>
+          <option>Нужен ремонт</option>
+          <option>Нужен расходник</option>
+        </select>
+
+        <label for="toolIssueImpact">Насколько мешает работе</label>
+        <select id="toolIssueImpact">
+          <option value="">Выбери вариант</option>
+          <option>Не мешает</option>
+          <option>Мешает частично</option>
+          <option>Работа стоит</option>
+        </select>
+
+        <label for="toolIssueComment">Что случилось</label>
+        <textarea id="toolIssueComment"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Скрытые работы</h2>
+
+      <label for="hiddenWorks">Были скрытые работы?</label>
+      <select id="hiddenWorks" required>
+        <option value="no">Нет</option>
+        <option value="yes">Да</option>
+      </select>
+
+      <div id="hiddenWorksBlock" class="hidden">
+        <label for="hiddenWorksText">Какие работы</label>
+        <textarea id="hiddenWorksText"></textarea>
+
+        <label for="hiddenWorksLocation">Где именно</label>
+        <input type="text" id="hiddenWorksLocation" />
+
+        <label for="hiddenWorksAct">Нужна фиксация для акта?</label>
+        <select id="hiddenWorksAct">
+          <option value="">Выбери вариант</option>
+          <option value="yes">Да</option>
+          <option value="no">Нет</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Проблемы на объекте</h2>
+
+      <label for="siteIssues">Были проблемы/препятствия?</label>
+      <select id="siteIssues" required>
+        <option value="no">Нет</option>
+        <option value="yes">Да</option>
+      </select>
+
+      <div id="siteIssuesBlock" class="hidden">
+        <label for="siteIssueType">Тип проблемы</label>
+        <select id="siteIssueType">
+          <option value="">Выбери проблему</option>
+          <option>Нет материала</option>
+          <option>Нет инструмента</option>
+          <option>Не хватает людей</option>
+          <option>Брак/дефект</option>
+          <option>Неготовность фронта</option>
+          <option>Нет доступа</option>
+          <option>Мешают смежники</option>
+          <option>Погода</option>
+          <option>Аварийная ситуация</option>
+          <option>Другое</option>
+        </select>
+
+        <label for="siteIssueComment">Комментарий</label>
+        <textarea id="siteIssueComment"></textarea>
+
+        <label for="needBossReaction">Нужна реакция руководителя?</label>
+        <select id="needBossReaction">
+          <option value="no">Нет</option>
+          <option value="yes">Да</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>План на завтра</h2>
+
+      <label for="tomorrowPlan">Что планируете делать завтра</label>
+      <textarea id="tomorrowPlan" required></textarea>
+
+      <label for="tomorrowLocation">Где именно</label>
+      <input type="text" id="tomorrowLocation" />
+
+      <label for="tomorrowNeeds">Что нужно подготовить</label>
+      <textarea id="tomorrowNeeds"></textarea>
+
+      <label for="tomorrowRisks">Есть риски на завтра?</label>
+      <select id="tomorrowRisks">
+        <option value="no">Нет</option>
+        <option value="yes">Да</option>
+      </select>
+
+      <div id="tomorrowRisksBlock" class="hidden">
+        <label for="tomorrowRisksText">Какие риски</label>
+        <textarea id="tomorrowRisksText"></textarea>
+      </div>
+    </div>
+
+    <button type="submit" class="submit-btn">Отправить отчёт</button>
+  </form>
+
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+
+    const OBJECTS = [
+      "Школа №5",
+      "Котельная на Бровках",
+      "Жилой дом Заславль",
+      "Фасад административного здания"
+    ];
+
+    const MATERIALS = [
+      "Цемент М500",
+      "Песок",
+      "Шпаклёвка старт",
+      "Шпаклёвка финиш",
+      "Грунтовка",
+      "Краска фасадная",
+      "Труба 57",
+      "Утеплитель",
+      "Клей для плитки"
+    ];
+
+    const WORK_TYPES = [
+      "Демонтаж",
+      "Монтаж",
+      "Штукатурка",
+      "Шпаклёвка",
+      "Покраска",
+      "Укладка плитки",
+      "Сварка",
+      "Земляные работы",
+      "Монтаж труб",
+      "Утепление",
+      "Фасадные работы",
+      "Кровельные работы",
+      "Электромонтаж",
+      "Сантехнические работы",
+      "Прочее"
+    ];
+
+    const UNIT_OPTIONS = ["шт", "м", "м²", "м³", "кг", "мешок", "упак", "л"];
+
+    function fillObjects() {
+      const select = document.getElementById("objectName");
+      OBJECTS.forEach(obj => {
+        const option = document.createElement("option");
+        option.value = obj;
+        option.textContent = obj;
+        select.appendChild(option);
+      });
+    }
+
+    function createSelect(options, className = "") {
+      const select = document.createElement("select");
+      if (className) select.className = className;
+      const first = document.createElement("option");
+      first.value = "";
+      first.textContent = "Выбери";
+      select.appendChild(first);
+      options.forEach(item => {
+        const option = document.createElement("option");
+        option.value = item;
+        option.textContent = item;
+        select.appendChild(option);
+      });
+      return select;
+    }
+
+    function addWork() {
+      const container = document.getElementById("worksContainer");
+      const item = document.createElement("div");
+      item.className = "item";
+
+      item.innerHTML = `
+        <label>Зона / участок / помещение</label>
+        <input type="text" class="work-zone" placeholder="Например: фасад север, санузел 2 этаж" />
+
+        <label>Вид работы</label>
+        <div class="work-type-holder"></div>
+
+        <div class="row">
+          <div>
+            <label>Объём</label>
+            <input type="number" step="0.01" class="work-volume" />
+          </div>
+          <div>
+            <label>Единица</label>
+            <div class="work-unit-holder"></div>
+          </div>
+        </div>
+
+        <label>Комментарий</label>
+        <textarea class="work-comment" placeholder="Коротко поясни нюанс"></textarea>
+
+        <button type="button" class="btn-danger">Удалить работу</button>
+      `;
+
+      const typeHolder = item.querySelector(".work-type-holder");
+      typeHolder.appendChild(createSelect(WORK_TYPES, "work-type"));
+
+      const unitHolder = item.querySelector(".work-unit-holder");
+      unitHolder.appendChild(createSelect(UNIT_OPTIONS, "work-unit"));
+
+      item.querySelector(".btn-danger").addEventListener("click", () => item.remove());
+      container.appendChild(item);
+    }
+
+    function addMaterial() {
+      const container = document.getElementById("materialsContainer");
+      const item = document.createElement("div");
+      item.className = "item";
+
+      item.innerHTML = `
+        <label>Материал</label>
+        <div class="material-name-holder"></div>
+
+        <div class="row">
+          <div>
+            <label>Количество</label>
+            <input type="number" step="0.01" class="material-qty" />
+          </div>
+          <div>
+            <label>Единица</label>
+            <div class="material-unit-holder"></div>
+          </div>
+        </div>
+
+        <label>Источник</label>
+        <select class="material-source">
+          <option value="">Выбери</option>
+          <option>Остаток на объекте</option>
+          <option>Со склада</option>
+          <option>Новый приход</option>
+        </select>
+
+        <label>Остаток после работ</label>
+        <select class="material-stock-status">
+          <option value="">Выбери</option>
+          <option>Хватает</option>
+          <option>Мало</option>
+          <option>Критически мало</option>
+          <option>Закончился</option>
+        </select>
+
+        <div class="material-request-block hidden">
+          <label>Нужна заявка?</label>
+          <select class="material-request-needed">
+            <option value="no">Нет</option>
+            <option value="yes">Да</option>
+          </select>
+
+          <label>Сколько нужно</label>
+          <input type="number" step="0.01" class="material-request-qty" />
+
+          <label>Когда нужно</label>
+          <select class="material-request-when">
+            <option value="">Выбери</option>
+            <option>Срочно</option>
+            <option>Завтра</option>
+            <option>В течение 2-3 дней</option>
+          </select>
+        </div>
+
+        <button type="button" class="btn-danger">Удалить материал</button>
+      `;
+
+      const nameHolder = item.querySelector(".material-name-holder");
+      nameHolder.appendChild(createSelect(MATERIALS, "material-name"));
+
+      const unitHolder = item.querySelector(".material-unit-holder");
+      unitHolder.appendChild(createSelect(UNIT_OPTIONS, "material-unit"));
+
+      const stockStatus = item.querySelector(".material-stock-status");
+      const requestBlock = item.querySelector(".material-request-block");
+
+      stockStatus.addEventListener("change", () => {
+        const v = stockStatus.value;
+        if (["Мало", "Критически мало", "Закончился"].includes(v)) {
+          requestBlock.classList.remove("hidden");
         } else {
-            tg.ready();
-            tg.expand();
-            console.log('Telegram WebApp инициализирован');
+          requestBlock.classList.add("hidden");
         }
+      });
 
-        const form = document.getElementById('reportForm');
-        const materialsContainer = document.getElementById('materials-container');
-        const addMaterialBtn = document.getElementById('add-material');
-        const submitBtn = document.getElementById('submit-btn');
-        const statusDiv = document.getElementById('status');
+      item.querySelector(".btn-danger").addEventListener("click", () => item.remove());
+      container.appendChild(item);
+    }
 
-        let materialCounter = 0;
+    function getWorks() {
+      return [...document.querySelectorAll("#worksContainer .item")].map(item => ({
+        zone: item.querySelector(".work-zone").value.trim(),
+        work_type: item.querySelector(".work-type").value,
+        volume: item.querySelector(".work-volume").value,
+        unit: item.querySelector(".work-unit").value,
+        comment: item.querySelector(".work-comment").value.trim()
+      })).filter(w => w.zone || w.work_type || w.volume || w.comment);
+    }
 
-        function addMaterialRow(name = '', qty = '') {
-            materialCounter++;
-            const rowId = `material-${materialCounter}`;
-            const div = document.createElement('div');
-            div.className = 'material-row';
-            div.id = rowId;
-            div.innerHTML = `
-                <label>Название материала</label>
-                <input type="text" class="material-name" placeholder="например, Цемент" value="${name}">
-                <label>Количество</label>
-                <input type="number" step="0.1" class="material-qty" placeholder="например, 10" value="${qty}">
-                <button type="button" class="remove-material" onclick="removeMaterial('${rowId}')">❌ Удалить</button>
-            `;
-            materialsContainer.appendChild(div);
-        }
+    function getMaterials() {
+      return [...document.querySelectorAll("#materialsContainer .item")].map(item => ({
+        material_name: item.querySelector(".material-name").value,
+        qty: item.querySelector(".material-qty").value,
+        unit: item.querySelector(".material-unit").value,
+        source: item.querySelector(".material-source").value,
+        stock_status: item.querySelector(".material-stock-status").value,
+        request_needed: item.querySelector(".material-request-needed")?.value || "no",
+        request_qty: item.querySelector(".material-request-qty")?.value || "",
+        request_when: item.querySelector(".material-request-when")?.value || ""
+      })).filter(m => m.material_name || m.qty);
+    }
 
-        window.removeMaterial = function(id) {
-            const el = document.getElementById(id);
-            if (el) el.remove();
-        };
+    function setToday() {
+      const today = new Date().toISOString().split("T")[0];
+      document.getElementById("reportDate").value = today;
+    }
 
-        addMaterialBtn.addEventListener('click', () => addMaterialRow());
-        // Одна строка по умолчанию
-        addMaterialRow();
+    document.getElementById("fullTeam").addEventListener("change", function() {
+      document.getElementById("absenceBlock").classList.toggle("hidden", this.value !== "no");
+    });
 
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            statusDiv.innerHTML = '';
-            if (!tg) {
-                statusDiv.innerHTML = '<span class="error">❌ Не в Telegram</span>';
-                return;
-            }
+    document.getElementById("planStatus").addEventListener("change", function() {
+      document.getElementById("planProblemsBlock").classList.toggle("hidden", this.value === "yes" || this.value === "");
+    });
 
-            statusDiv.textContent = '⏳ Отправка...';
-            submitBtn.disabled = true;
+    document.getElementById("usedMaterials").addEventListener("change", function() {
+      document.getElementById("materialsBlock").classList.toggle("hidden", this.value !== "yes");
+    });
 
-            const brigade = document.getElementById('brigade').value;
-            const object = document.getElementById('object').value;
-            const text = document.getElementById('text').value;
-            const hidden = document.getElementById('hidden').value;
+    document.getElementById("toolIssues").addEventListener("change", function() {
+      document.getElementById("toolIssuesBlock").classList.toggle("hidden", this.value !== "yes");
+    });
 
-            const materials = [];
-            document.querySelectorAll('.material-row').forEach(row => {
-                const name = row.querySelector('.material-name')?.value.trim();
-                const qty = row.querySelector('.material-qty')?.value.trim();
-                if (name && qty) {
-                    materials.push({ name, qty: parseFloat(qty) });
-                }
-            });
+    document.getElementById("hiddenWorks").addEventListener("change", function() {
+      document.getElementById("hiddenWorksBlock").classList.toggle("hidden", this.value !== "yes");
+    });
 
-            if (!brigade || !object || !text) {
-                statusDiv.innerHTML = '<span class="error">❌ Заполни бригаду, объект и текст!</span>';
-                submitBtn.disabled = false;
-                return;
-            }
+    document.getElementById("siteIssues").addEventListener("change", function() {
+      document.getElementById("siteIssuesBlock").classList.toggle("hidden", this.value !== "yes");
+    });
 
-            const reportData = {
-                brigade,
-                object,
-                text,
-                hidden: hidden === 'Да',
-                materials: materials,
-            };
+    document.getElementById("tomorrowRisks").addEventListener("change", function() {
+      document.getElementById("tomorrowRisksBlock").classList.toggle("hidden", this.value !== "yes");
+    });
 
-            const jsonData = JSON.stringify(reportData);
-            console.log('Отправляемые данные:', jsonData);
+    document.getElementById("reportForm").addEventListener("submit", function(e) {
+      e.preventDefault();
 
-            if (jsonData.length > 4096) {
-                statusDiv.innerHTML = '<span class="error">❌ Слишком много данных! Уменьши количество материалов.</span>';
-                submitBtn.disabled = false;
-                return;
-            }
+      const data = {
+        report_type: "evening_report_v2",
+        report_date: document.getElementById("reportDate").value,
+        brigade: document.getElementById("brigade").value,
+        object_name: document.getElementById("objectName").value,
+        workers_count: Number(document.getElementById("workersCount").value || 0),
+        full_team: document.getElementById("fullTeam").value,
+        absent_people: document.getElementById("absentPeople").value.trim(),
+        absence_reason: document.getElementById("absenceReason").value,
+        works: getWorks(),
+        plan_status: document.getElementById("planStatus").value,
+        unfinished_work: document.getElementById("unfinishedWork").value.trim(),
+        plan_issue_reason: document.getElementById("planIssueReason").value,
+        need_tomorrow: document.getElementById("needTomorrow").value.trim(),
+        used_materials: document.getElementById("usedMaterials").value,
+        materials: getMaterials(),
+        tool_issues: document.getElementById("toolIssues").value,
+        tool_issue_type: document.getElementById("toolIssueType").value,
+        tool_issue_impact: document.getElementById("toolIssueImpact").value,
+        tool_issue_comment: document.getElementById("toolIssueComment").value.trim(),
+        hidden_works: document.getElementById("hiddenWorks").value,
+        hidden_works_text: document.getElementById("hiddenWorksText").value.trim(),
+        hidden_works_location: document.getElementById("hiddenWorksLocation").value.trim(),
+        hidden_works_act: document.getElementById("hiddenWorksAct").value,
+        site_issues: document.getElementById("siteIssues").value,
+        site_issue_type: document.getElementById("siteIssueType").value,
+        site_issue_comment: document.getElementById("siteIssueComment").value.trim(),
+        need_boss_reaction: document.getElementById("needBossReaction").value,
+        tomorrow_plan: document.getElementById("tomorrowPlan").value.trim(),
+        tomorrow_location: document.getElementById("tomorrowLocation").value.trim(),
+        tomorrow_needs: document.getElementById("tomorrowNeeds").value.trim(),
+        tomorrow_risks: document.getElementById("tomorrowRisks").value,
+        tomorrow_risks_text: document.getElementById("tomorrowRisksText").value.trim(),
+        tg_user: tg.initDataUnsafe?.user || null
+      };
 
-            try {
-                tg.sendData(jsonData);
-                statusDiv.innerHTML = '<span class="status">✅ Данные отправлены! Закрываю форму...</span>';
-                setTimeout(() => tg.close(), 500);
-            } catch (err) {
-                console.error('Ошибка при отправке:', err);
-                statusDiv.innerHTML = '<span class="error">❌ Ошибка отправки</span>';
-                submitBtn.disabled = false;
-            }
-        });
-    </script>
+      if (!data.brigade || !data.object_name || !data.report_date || !data.workers_count) {
+        tg.showAlert("Заполни обязательные поля, шеф.");
+        return;
+      }
+
+      if (data.works.length === 0) {
+        tg.showAlert("Добавь хотя бы одну выполненную работу.");
+        return;
+      }
+
+      tg.sendData(JSON.stringify(data));
+      tg.close();
+    });
+
+    fillObjects();
+    setToday();
+    addWork();
+  </script>
 </body>
 </html>
