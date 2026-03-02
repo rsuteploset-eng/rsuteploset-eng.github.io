@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Вечерний отчёт РСУ</title>
+  <title>Вечерний отчёт РСУ v2</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; padding: 14px; background:#f4f4f4; color:#222; }
@@ -91,8 +91,75 @@
   </div>
 
   <div class="card">
+    <h2>Паспорт работ по типу объекта</h2>
+
+    <div id="boilerFields" class="hidden">
+      <label>Узел / помещение</label>
+      <input id="boiler_zone" placeholder="Напр: насосная, котловой зал, узел учета" />
+      <label>Оборудование / система</label>
+      <input id="boiler_equipment" placeholder="Напр: котел, насос, трубопровод, дымоход" />
+    </div>
+
+    <div id="heatFields" class="hidden">
+      <div class="row">
+        <div>
+          <label>Длина участка (м)</label>
+          <input type="number" step="0.01" id="heat_length_m" />
+        </div>
+        <div>
+          <label>Диаметр трубы</label>
+          <input id="heat_pipe_diameter" placeholder="Напр: 57, 89, 108" />
+        </div>
+      </div>
+      <label>Траншея / камера / участок</label>
+      <input id="heat_zone" placeholder="Напр: от ТК-1 до ТК-2" />
+    </div>
+
+    <div id="bathFields" class="hidden">
+      <label>Зона</label>
+      <input id="bath_zone" placeholder="Напр: парная, моечная, коридор" />
+      <label>Тип работ</label>
+      <input id="bath_work_focus" placeholder="Напр: плитка, гидроизоляция, отделка" />
+    </div>
+
+    <div id="roadFields" class="hidden">
+      <div class="row">
+        <div>
+          <label>Площадь / длина</label>
+          <input type="number" step="0.01" id="road_volume" />
+        </div>
+        <div>
+          <label>Ед. измерения</label>
+          <select id="road_unit">
+            <option value="">Выбери</option>
+            <option>м²</option>
+            <option>м</option>
+            <option>шт</option>
+          </select>
+        </div>
+      </div>
+      <label>Участок</label>
+      <input id="road_zone" placeholder="Напр: входная группа, двор, тротуар у котельной" />
+    </div>
+
+    <div id="buildingFields" class="hidden">
+      <label>Помещение / зона</label>
+      <input id="building_zone" placeholder="Напр: кабинет, санузел, коридор" />
+      <label>Фокус работ</label>
+      <input id="building_focus" placeholder="Напр: шпаклевка, покраска, плитка" />
+    </div>
+
+    <div id="reconFields" class="hidden">
+      <label>Этап реконструкции</label>
+      <input id="recon_stage" placeholder="Напр: демонтаж, подготовка, монтаж, пусконаладка" />
+      <label>Ключевой узел / зона</label>
+      <input id="recon_zone" placeholder="Напр: котловой зал, теплотрасса, узел ввода" />
+    </div>
+  </div>
+
+  <div class="card">
     <h2>Выполненные работы</h2>
-    <div class="hint">Добавь минимум 1 работу. Пиши объемы, это поможет аналитике.</div>
+    <div class="hint">Добавь минимум 1 работу. Пиши объёмы, это поможет аналитике.</div>
     <div id="worksContainer"></div>
     <button type="button" class="btn-secondary" onclick="addWork()">+ Добавить работу</button>
   </div>
@@ -117,9 +184,24 @@
       <option value="yes">Да</option>
     </select>
     <div id="arrivedTodayBlock" class="hidden">
-      <div class="hint">Если приехало по ТТН, потом добавим кнопку “сфотографировать ТТН”. Сейчас фиксируем фактом.</div>
       <div id="materialsArrivedContainer"></div>
       <button type="button" class="btn-secondary" onclick="addMaterial('arrived')">+ Добавить (приехало)</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Инструмент и инвентарь</h2>
+    <div class="hint">Тут не надо писать всё имущество мира. Пиши ключевое, что использовали или что болит.</div>
+
+    <label>Был важный инструмент / инвентарь сегодня?</label>
+    <select id="assetsUsedToday">
+      <option value="no">Нет</option>
+      <option value="yes">Да</option>
+    </select>
+
+    <div id="assetsBlock" class="hidden">
+      <div id="assetsContainer"></div>
+      <button type="button" class="btn-secondary" onclick="addAsset()">+ Добавить инструмент / инвентарь</button>
     </div>
   </div>
 
@@ -163,7 +245,7 @@
     <label>Что делаете завтра</label>
     <textarea id="tomorrowPlan" required></textarea>
 
-    <label>Что нужно (материал/инструмент/люди)</label>
+    <label>Что нужно (материал / инструмент / люди)</label>
     <textarea id="tomorrowNeeds"></textarea>
 
     <label>Риски на завтра?</label>
@@ -191,6 +273,8 @@
     "Кровельные работы", "Электромонтаж", "Сантехнические работы", "Прочее"
   ];
   const UNITS = ["шт","м","м²","м³","кг","мешок","упак","л","т","компл"];
+  const ASSET_STATUS = ["Использовали", "Осталось на объекте", "Неисправно", "Не хватает", "Отсутствует"];
+  const ASSET_TYPES = ["Перфоратор", "Болгарка", "Шуруповерт", "Лазер", "Сварочник", "Генератор", "Насос", "Леса", "Лестница", "Вышка", "Удлинитель", "Тачка", "Ящик", "Другое"];
 
   function setToday(){
     document.getElementById("reportDate").value = new Date().toISOString().split("T")[0];
@@ -209,13 +293,30 @@
     return s;
   }
 
+  function hideAllObjectBlocks(){
+    ["boilerFields","heatFields","bathFields","roadFields","buildingFields","reconFields"].forEach(id=>{
+      document.getElementById(id).classList.add("hidden");
+    });
+  }
+
+  function onObjectTypeChange(){
+    hideAllObjectBlocks();
+    const v = document.getElementById("objectType").value;
+    if (v === "boiler_house") document.getElementById("boilerFields").classList.remove("hidden");
+    if (v === "heating_main") document.getElementById("heatFields").classList.remove("hidden");
+    if (v === "bathhouse") document.getElementById("bathFields").classList.remove("hidden");
+    if (v === "road") document.getElementById("roadFields").classList.remove("hidden");
+    if (v === "building") document.getElementById("buildingFields").classList.remove("hidden");
+    if (v === "reconstruction") document.getElementById("reconFields").classList.remove("hidden");
+  }
+
   function addWork(){
     const c = document.getElementById("worksContainer");
     const item = document.createElement("div");
     item.className="item";
     item.innerHTML = `
       <label>Зона/участок</label>
-      <input class="w-zone" placeholder="Напр: котельная зал, траншея А-Б, фасад север" />
+      <input class="w-zone" placeholder="Напр: котельный зал, траншея А-Б, фасад север" />
       <label>Вид работы</label>
       <div class="w-type"></div>
       <div class="row">
@@ -277,6 +378,33 @@
     container.appendChild(item);
   }
 
+  function addAsset(){
+    const c = document.getElementById("assetsContainer");
+    const item = document.createElement("div");
+    item.className="item";
+    item.innerHTML = `
+      <label>Что за инструмент / инвентарь</label>
+      <div class="a-type"></div>
+
+      <label>Название / уточнение</label>
+      <input class="a-name" placeholder="Напр: Makita 2470, леса комплект 1, удлинитель 50 м" />
+
+      <label>Статус</label>
+      <div class="a-status"></div>
+
+      <label>Комментарий</label>
+      <input class="a-comment" placeholder="Напр: остался на объекте, неисправна кнопка, нужно ещё 1 перф" />
+
+      <button type="button" class="btn-danger">Удалить</button>
+    `;
+    item.querySelector(".a-type").appendChild(createSelect(ASSET_TYPES));
+    item.querySelector(".a-type select").className="a-type-sel";
+    item.querySelector(".a-status").appendChild(createSelect(ASSET_STATUS));
+    item.querySelector(".a-status select").className="a-status-sel";
+    item.querySelector(".btn-danger").addEventListener("click", ()=>item.remove());
+    c.appendChild(item);
+  }
+
   function getWorks(){
     return [...document.querySelectorAll("#worksContainer .item")].map(it=>({
       zone: it.querySelector(".w-zone").value.trim(),
@@ -298,6 +426,50 @@
     })).filter(m => m.raw_name || m.qty);
   }
 
+  function getAssets(){
+    return [...document.querySelectorAll("#assetsContainer .item")].map(it=>({
+      asset_type: it.querySelector(".a-type-sel").value,
+      asset_name: it.querySelector(".a-name").value.trim(),
+      asset_status: it.querySelector(".a-status-sel").value,
+      comment: it.querySelector(".a-comment").value.trim()
+    })).filter(a => a.asset_type || a.asset_name || a.asset_status || a.comment);
+  }
+
+  function getObjectMeta(){
+    const objectType = document.getElementById("objectType").value;
+    const meta = {};
+
+    if (objectType === "boiler_house"){
+      meta.boiler_zone = document.getElementById("boiler_zone").value.trim();
+      meta.boiler_equipment = document.getElementById("boiler_equipment").value.trim();
+    }
+    if (objectType === "heating_main"){
+      meta.heat_length_m = document.getElementById("heat_length_m").value;
+      meta.heat_pipe_diameter = document.getElementById("heat_pipe_diameter").value.trim();
+      meta.heat_zone = document.getElementById("heat_zone").value.trim();
+    }
+    if (objectType === "bathhouse"){
+      meta.bath_zone = document.getElementById("bath_zone").value.trim();
+      meta.bath_work_focus = document.getElementById("bath_work_focus").value.trim();
+    }
+    if (objectType === "road"){
+      meta.road_volume = document.getElementById("road_volume").value;
+      meta.road_unit = document.getElementById("road_unit").value;
+      meta.road_zone = document.getElementById("road_zone").value.trim();
+    }
+    if (objectType === "building"){
+      meta.building_zone = document.getElementById("building_zone").value.trim();
+      meta.building_focus = document.getElementById("building_focus").value.trim();
+    }
+    if (objectType === "reconstruction"){
+      meta.recon_stage = document.getElementById("recon_stage").value.trim();
+      meta.recon_zone = document.getElementById("recon_zone").value.trim();
+    }
+
+    return meta;
+  }
+
+  document.getElementById("objectType").addEventListener("change", onObjectTypeChange);
   document.getElementById("planStatus").addEventListener("change", function(){
     document.getElementById("planProblemsBlock").classList.toggle("hidden", this.value === "yes" || this.value === "");
   });
@@ -312,6 +484,9 @@
   });
   document.getElementById("arrivedToday").addEventListener("change", function(){
     document.getElementById("arrivedTodayBlock").classList.toggle("hidden", this.value !== "yes");
+  });
+  document.getElementById("assetsUsedToday").addEventListener("change", function(){
+    document.getElementById("assetsBlock").classList.toggle("hidden", this.value !== "yes");
   });
 
   document.getElementById("reportForm").addEventListener("submit", function(e){
@@ -328,9 +503,11 @@
       ...getMaterials("materialsArrivedContainer", "arrived_today")
     ];
 
+    const assets = getAssets();
+
     const payload = {
-      report_type: "evening_report_v1",
-      form_version: 1,
+      report_type: "evening_report_v2",
+      form_version: 2,
       report_date: document.getElementById("reportDate").value,
       brigade: document.getElementById("brigade").value,
       object_type: document.getElementById("objectType").value,
@@ -339,8 +516,10 @@
       plan_status: document.getElementById("planStatus").value,
       unfinished_work: document.getElementById("unfinishedWork").value.trim(),
       plan_issue_reason: document.getElementById("planIssueReason").value,
+      object_meta: getObjectMeta(),
       works,
       materials,
+      assets,
       site_issues: document.getElementById("siteIssues").value,
       site_issue_type: document.getElementById("siteIssueType").value,
       site_issue_comment: document.getElementById("siteIssueComment").value.trim(),
