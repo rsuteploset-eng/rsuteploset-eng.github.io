@@ -3,303 +3,963 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Вечерний отчёт РСУ v3</title>
+  <title>Минрайтеплосеть • РСУ • Вечерний отчёт v3</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 0; padding: 14px; background:#f4f4f4; color:#222; }
-    .card { background:#fff; border-radius: 12px; padding: 14px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
-    h2 { margin:0 0 8px; font-size: 18px; }
-    label { display:block; margin-top: 10px; margin-bottom: 4px; font-weight: 700; }
-    input, select, textarea, button { width:100%; box-sizing:border-box; padding:10px; border:1px solid #ccc; border-radius:10px; font-size:14px; }
-    textarea { min-height: 80px; resize: vertical; }
-    .row { display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .hidden { display:none; }
-    .item { border:1px dashed #bbb; border-radius: 10px; padding: 10px; margin-top: 10px; background:#fafafa; }
-    .btn-secondary { margin-top:10px; background:#ececec; border:none; cursor:pointer; }
-    .btn-danger { margin-top:10px; background:#ffdede; border:none; cursor:pointer; }
-    .submit-btn { background:#2f7cff; color:#fff; border:none; font-weight:800; cursor:pointer; padding:12px; border-radius: 12px; }
-    .hint { font-size: 12px; color:#666; margin-top:4px; }
+    :root {
+      --brand: #355d2f;
+      --brand-dark: #213d1d;
+      --brand-light: #edf4eb;
+      --border: #d7dfd4;
+      --text: #1e2a1c;
+      --muted: #657064;
+      --bg: #f4f6f3;
+      --danger: #ffdede;
+      --soft: #f8faf7;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding: 14px;
+    }
+    .header {
+      background: linear-gradient(135deg, #ffffff, #f4f8f2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      margin-bottom: 12px;
+      display: grid;
+      grid-template-columns: 72px 1fr;
+      gap: 12px;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,.06);
+    }
+    .header img {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      border-radius: 14px;
+      background: #fff;
+      border: 1px solid var(--border);
+      padding: 6px;
+    }
+    .header h1 {
+      margin: 0 0 4px 0;
+      font-size: 20px;
+      color: var(--brand-dark);
+    }
+    .header p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 12px;
+      border: 1px solid var(--border);
+      box-shadow: 0 2px 8px rgba(0,0,0,.05);
+    }
+    h2 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      color: var(--brand-dark);
+    }
+    label {
+      display: block;
+      margin-top: 10px;
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+    input, select, textarea, button {
+      width: 100%;
+      font-size: 14px;
+      padding: 10px;
+      border: 1px solid #cfd7cb;
+      border-radius: 10px;
+      background: #fff;
+    }
+    textarea {
+      min-height: 84px;
+      resize: vertical;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .hidden { display: none; }
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    .item {
+      border: 1px dashed #b8c4b4;
+      border-radius: 12px;
+      padding: 10px;
+      background: var(--soft);
+      margin-top: 10px;
+    }
+    .btn-secondary {
+      margin-top: 10px;
+      background: #edf1eb;
+      border: 1px solid var(--border);
+      cursor: pointer;
+    }
+    .btn-danger {
+      margin-top: 10px;
+      background: var(--danger);
+      border: 1px solid #f2b8b8;
+      cursor: pointer;
+    }
+    .submit-btn {
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      font-weight: 800;
+      padding: 12px;
+      border-radius: 12px;
+      cursor: pointer;
+    }
+    .pill {
+      display: inline-block;
+      margin-top: 6px;
+      font-size: 12px;
+      color: var(--brand-dark);
+      background: var(--brand-light);
+      border-radius: 999px;
+      padding: 5px 9px;
+    }
   </style>
 </head>
 <body>
-<form id="reportForm">
-
-  <div class="card">
-    <h2>1. Направление работ</h2>
-    <label>Выбери направление</label>
-    <select id="direction" required>
-      <option value="">Выбери</option>
-      <option value="heating_main">Теплотрасса</option>
-      <option value="boiler_ctp">Котельная / ЦТП</option>
-      <option value="finish">Отделка / ремонт помещения</option>
-      <option value="landscaping">Благоустройство / дорога / тротуар</option>
-      <option value="bathhouse">Баня</option>
-      <option value="reconstruction">Реконструкция</option>
-      <option value="emergency">Аварийные работы</option>
-      <option value="other">Прочее</option>
-    </select>
-  </div>
-
-  <div class="card">
-    <h2>2. Общая шапка</h2>
-
-    <label>Бригада</label>
-    <select id="brigade" required>
-      <option value="">Выбери</option>
-      <option>Теплотрасса</option>
-      <option>Отделочники</option>
-      <option>Котельные</option>
-      <option>Фасад</option>
-    </select>
-
-    <label>Тип объекта</label>
-    <select id="objectType" required>
-      <option value="">Выбери</option>
-      <option value="boiler_house">Котельная</option>
-      <option value="ctp">ЦТП</option>
-      <option value="heating_main">Теплотрасса</option>
-      <option value="bathhouse">Баня</option>
-      <option value="road">Дорога / тротуар</option>
-      <option value="building">Здание / помещение</option>
-      <option value="reconstruction">Реконструкция</option>
-      <option value="other">Другое</option>
-    </select>
-
-    <label>Объект</label>
-    <input id="objectName" placeholder="Напр: Котельная №17 / Теплотрасса ул. Ленина" required />
-
-    <label>Адрес / участок</label>
-    <input id="objectAddress" placeholder="Напр: Заславль, ул. Ленина / ТК-1 — ТК-2" />
-
-    <div class="row">
-      <div>
-        <label>Дата</label>
-        <input type="date" id="reportDate" required />
-      </div>
-      <div>
-        <label>Сколько человек вышло</label>
-        <input type="number" id="workersCount" min="1" required />
-      </div>
-    </div>
-
-    <div class="row">
-      <div>
-        <label>Смена</label>
-        <select id="shiftType">
-          <option value="">Выбери</option>
-          <option value="day">Дневная</option>
-          <option value="evening">Вечерняя</option>
-          <option value="emergency">Аварийная</option>
-        </select>
-      </div>
-      <div>
-        <label>План выполнен?</label>
-        <select id="planStatus" required>
-          <option value="">Выбери</option>
-          <option value="yes">Да</option>
-          <option value="partial">Частично</option>
-          <option value="no">Нет</option>
-        </select>
-      </div>
+  <div class="header">
+    <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAABg1BMVEX///9CJ3RCJ3JCJ3VCJnb8+/vxfSzvfizxfSvxfC43FHPvfS/xfC/6+Pj+/fzzfCq5tMXufTL79PNBJHff3eNBKGvufijwfTJOO3exq770ey318fD15uXm3NrzfSjs6u5FL3T14uHCvcz2eybt5eTby8fGqaH119bAYCfWxcHVbzL77+7tysnyfiDw6ujPuLK+nZPnezqyhnftt7bhejvqvry4YDSwZUTuAACtdmJfTYRPOHzIjXLFp5/LbDbkdzSsZEi1YDXpmJfeTUjooqDmhIPfd3SzjYDoginkGADeLy3eV1LorKrszMrxJSOucFjeZGA0EGijmrKCd5rHl4PQzNjWdD2+e1zFdUmhXUK2WCOja1fWby20dl2rWDSsemmrVirPAADibm7sQ0HuY2LYaGTbhoP1r67SODTPHQ7QRz/VXVjwLCzhIQDylpbtaGnMeHDwNjfrgYDVLirMQh3+Gh0xB29xYYrwVVfmg3CPhaX8AADsRkdlVYdeSojkf07VhF457pS5AAAgAElEQVR4nNV9C0PaWNduvOTmTshssEkbIC2NiNyEyK22NYiiKFLUTkvbmVY7OnXqOzrztXPa6ZmvnfP+9LN2wt2AinjpmqlACGE/Wbdnrb0TKOoqRBS9s7P+4ALIdHJhIRH0T816RdeVfPflinfKH04kks8eP37x4mXWBKmRP2Y2+zL34vGz5HQiDFjF6x7mQOLy+sMLc29yObOWzucFQVGwIkiMxPM8I0k8vMSqks9HatmXL+bnFsJ+L33dQz6HiFPBROlNAbAZGAuCwDKSqkmSynEcA/80DpDCS1WVVB4hjPNGzSy8KU0HZ6975GcR2htM7uYK5muMWVYjIssyQgoLgjFWrH+IRSyLBJ6RAa+mqxKB+Xom+2IuMXXDVekNl+bBLjFGoCwBHniAwqiMpLEIqaA4DoBy5JGok+VYBqxWANg8J/EIG7Vsbi7hv7F+6U2UFn+K5LHCIdASA46mCgjxNiwJ8KkY4bU10CK8A0LUyrAsD9A5XtEY0DGn4Hwkt5sM3kCQYrD0KlvLCzBkZA2dYeQ4x8U1XmUQzudfR2aI/AT/gZgzM5FI3lAYhBhdF5DMKRwDH4XPMqoAqvx52n+zzHVq+uediIEZDUFkIUOVJVXQ4kbaiJjZws7i5m5pYTqRCIeDIGEiienk3OZirlAwI/k0ljUFPkXUKiAWg+rTkcJuwnvdsBpC+0uLMwYWNFnjZIzluK6rAjE3s7D4prQQDk55RSeF0EADIF0C0pfma1CoAEEnDqaKJDgSb0Sym0n/lYNxEG94LgfqEwSew8T9VI3BBgxvZxPC/9RZ1EBD6kzO57LgwhjJCs9CZCXR1UhHcqVr90hvYj5bQ3FdwDwDSY6BwJiHgLhZSvjPR1W8U8EFCMMRrGoaw6ssOC/SVSOSm7tWjO7EfCFiGLIGAQMEcEKQWIR4P5gHiVPh5BuiSlUHhBB1ICgbkcJc+LoILJ3YLKRZDrxOlWWInhyM5tVu4mJB0AsxufCa5YhBICADEINqO3PX44/+uZ00i4B8gevoQE3S2dxuYhi8CxIPRC5F0sD4WWA9gmDuJKeGcODziX/uLfgMaE7ikExCy0+vFvqNQqRc/gA8un1iiLwMRek+/uVN7GbB/Fli/iyvCPj1TvJqSas3+co04msC5GiZ0+N5c6d3QHCnAN3qEkW9K1JUCB5DRRfl/sVH+X19voGeSi6aOK6rSOV5VZeN7GbiCjlAcDebNgRtDcg1ieozuWTQ4dshPgRW3VRgPUpRf/xBUR+LlHsrA2/sPaHEXwgKspdvL0BFAw6nx+Wf3gRj5YHZYQYyUL5wZe44m8yBgcokCmiskTYXHcxTBCMEawzsByjXEVhnag+ALQFaojcC9RcxYO8ZWnZTob/gJLhPnqTZxLyJFUaTJV2Pa4a5OH0lNCc4X0hrccwoQpzVjOyiI/FIbVg6pH7NUO5yiqIqXyiqeED5qgThXpHyrbtD9p6ZVReghCcrFdF94jiziU3TAG/XBEiPSjp7BWr0LuxEMBIEhBWZTZu5E/hEOlAUqcCyPdq9Fcq1UrQRx1bBHwFtdCtAhcqN/YvwbmUVnnwJuZbc1In4M7WQM4EyQWZUNRmbi4lLJgD+3YKhxeOqwmqq9jpXOmGfoXc09UuMEn9NWdAPILJUVkBToKXYnkhFK/CYsRGL1liJZ67AXoE/KfdyiAr9Gui2Vn+ykFf0uKypArCcQulSg+o0eKDOYYVFKpsu7Hbpj/Z5qehGgDqAoe/9YVnpb+B/qS2R8j0hvkl2clEEmNsHhN1CuA7WuvWbtWcIFLwESj/BGfxzPxkKZA6eVVTWfBW+NHze0tu8AvaCkSYbZnf0pg+s2HFwIBaLUSr1J5ijDwbtovpzrkqUcm+kLI8Fcf31xN4c7fRJ4o44LpPSGuV3Fi4pb/jns4bKgw8ySMl3swzaS+39Rp6QqLF3QIX+46aeRM94ZIDje29BCn2NWUipkM/XgXEqSRgizyOeUSHgXIqlhhcjSFaxpGsQt+c7EyAdddGAjWxzH7qpYoUSfeejy7S9/16KsoCBjy4VO3cIzpuGAnQVqWsYvv9CWJzENZ2rKcBiFFXC6VwnhYIXPgLuHTn99JcMFRi0GBD361nSS7nfhchD+9eAGg1eEvBaHNdyiSEXHCLEszUoalRehYjdWc6E6q5DPfmTbPf1I2MgtKvP2AJuOgBKjIpUimSQ1VTHvonFGtYgyEkqrr0drjOKpSzmZAWcXTey3SH0oOluhzHnj9NiIEOMz7e0slJJZSorK7aPeU+meEBHuwmJ2wIVhg5nKW97/vPPZQ0prhhKXIa0MUSIs3BgWRWAPgnpt6W2r6SfgFXthRovYxbWYsuB6EDoSWVpLxPI/McKIEvHhJ9Rgd/tkxL4a6OYCXXDjBYzopViqK0KiT3tNiEm3xoqp0mqwBuFuaEl/6mfTUPSVQW4Wq0jGfnoTDlAfVzp2Nv1tYnQ/a4YpffW9wGPaCHMPFi23gjZo3ZvrG+5fYEnmVh31HWRwJz6SluJtUPCmzWwJKCMcWNmd0gh1f9zhMQw0GGXhfrKUeogRkXL4C2WxbhXKzT9pEI1aLR7CR5S6x9I+KBthF9s07L/ho4+kZ2p2Hp1taudH4V49R7SZOYrqDhTaXtnCti4yguSBpXx/FAKY/+miTkeIQFqtFInt//jgCIu41tKWbGUopc2MhAo6NDSqmV6NPn75LjaCEVUZn0ZakN36+WhFTsz1eoJD3ZTsXdwhGVA6S4/8bYpebYEhSOLDTmOhwLRP28yqooMRU0Xkl2GLy7/Zj9pnn+75Pv1uNxyHt/xp0wLEiAsNv22WC1baP84PHaKOSKpSeCNlY9UaLVNxWIya3AIs4jB5u6FIRINaiqkICGdm24L3TbjiP3aNTI7caeqR6nmJnd5vemYYLG+zHo950HVcbxlPdlb/9o6RLQ9QRTh5MTKAXrvo81n65LI5Zm4hFjOuLAWZ+drLKfxCqvnFxPtb1Q2rHF+XGkfT7TyqxV1wOr2Wls31ps7VapHPtdBQ4fR/6wvkUf38qe2YJU58LXpC4z6S5GKptzg5KHW5nDOYCUkk3pq/kJVsXfXZMnsiaakc508Kbr0noSRQKo9QKSq61sETGbjqBxobgVNNU5/pbrvpqINnwocPrBCSOio2lI5FQuFUu3xLPO7/RVLy+1pI7yYFiSelYmhXiBpiHMmmfDiODayeIIIBjb+U+nOuQeHhHbRgcD+eivIF9eXG5iKv3ytD8c6EYd2gEmtl1vqsVpxf76LtYZtP0vtA8C23BlczDOSwKO4Yg6e+mlgMhLPyLqSftU6q7O/kzG44Hszxe5PBP46AruDYnBp/WtzMKkHzbizdLxvbw6RQa1Ul0V76/vWyEPkbGx8Oqx0aiZUhoBcWW/TdRB8UdMYxFyA3UwDReJYdk1JtzTogiy/IdoIHWTvGAYdClGx6nEzh2Wqhw2TrXMa0tAA+fXTr+RB3DreaB2BaDVzdNyeAUF8X7egjiwftG8LLqbZODa0uLEzPRjARAFzusSwuNZmojSc/eIG8UDH8wa5O0U9gQJ+63i5se3J0S/1U+9e3d8vBkKZlfckssSq6xZQ3/5xK9AQFYob1cOuGO2Gopo6IKfW3W6oBosAIWvsJKgBBE4RJ6mqIKRbn6fBfeCriuBkbscKIbpR/ZN6QhLZYVNxmfJ/Dux4J0ajUZ8vEAiR+oEKFfesiJupHjfN3UXIAZympZOHdv0GFIoKbB20YidEVI4TFF7ujoNnkqnNGqvxAny60LIBNxyd9PxWV1OtU1lpi+JU5bgcItQ1+uG4kSOivmgPP3FFiVJWy8eEuFSI/ZK2AL16eOTQHfCRXge1tOJ2tSAmIGnwqsrh2vnTIgmjKpm2NrILbZvJUGFUgVDbrG6x3f8D5aMy8SHXrw/KsbMFAHegAs5XeQB/AoT9xMrVhtWGMpVMM+1Yng+EiP69yQIhVGBNkkjReu5okyxgWSdenE12f9QldtbwmQeHq61UtXpoAXYtVc7apbElth6jAlby+HhctVEF9g4frC+vFJsHj61uVFPi3l5rRHTJNFQJ6VAuJs/1dVTirSHJKuZwtlUOVvaXLAdy/0/nvoEH1epfzdgXqlpOdP4eQ6xoqyt0dGwTothR9dM7gi7WUCOdgbO2sUWWDjQ+5SUpG+K9nD5ftJl6lZcUrMaF2m7L6N2xpdVDku66Ink0VTk6PtqrD8P94Hj1lD5Gfzk4LluqDL0//HRga6vScnr3yu8iKVqaapydf62pwCrV9KtzVIviXIRjMWa19GLzZM2SYbui1uSfvYWu9zTpDBXaOzr8ULH05l7NXKS7QFeO7BxCrR5V39U3ZlrZpFLnbpVmueVfNFQWmKVinqPmB//lkCBJ6betPOG23MrdYsWZveXlInnlihG3O6pWLWp8weaJmNqyA1dgv9oke5m/mkp0W6biWvoaa/oB8ShJlZhzZEV/ztB5JDE4O9fY1FgbGWhkLlem+MeHqj2YEOWa9YZWq8dHS53RhSZ4zwtZzFihMvbgsBmil9ZDHbu4V6CyabWoSlnE6Awj5XNnnJny7kY0DfMaFCYtbtm1D12Bc+lbXt8ie2R81uKLpWoXQAAnUtT5mb/Vbow92GtoKVo+7kDo29qLtscy73wEq4zCS5G5s1VSJMdgrEptTkjZk2XexlHFFasaCB1ZFXDFxh8IUSfENQhCS2IPmmf141E10P7W6oZtF81868+lQSdIxWcjqOC5cQHLEi60mfWB5evNGLn0oLpB9PXF6mL0m59wUfRgnun+0jhhlerxckfysakpvVJufm8ii1UZK/F2pfQUca4mC4oQRx0swVfeC7nbVjlVyuugPteBtSUQOHGUdhkw9jSiZezoaP3Jybd9f261TiwwMEWGQQtm6fREDDYaB5NW85sNpieGoPD0rawW21WVOjrcE5/YfiquhvqhGHBNvmi1yanUh2p15eS7sQ8f4Tt9jSH5F/My4jQdF06dXJzdNDjFkNl0c1c6kNpaPulixepRo60Q/d3BA+sfJv8N6InuWCwUWilXy0vWKQqkliqxRugLLJOJgWK5WYMksorGYlaOnNq2SZpGXDGkNhslPG2p1R1sjFf8WG3UOA4rDBpitYp7v91f6Njq8v7yQYgADH3crz6olrfqUzWkTIVCeaVpVkBSGBXsFHh0/4NOFQxFF5BuNF02amFbajK1SsPpxNXDancSOSlkQJaZEm32m3VyFrfbPqGx5eNq+SAUDRSbA6FT++1fD0lcW4MkUMv1r6NKrzVeleJathlHA5aioo1MnzlsOkV049NfqdM4NkmJtF1ziQPbKxUFxrRsR55Yo7289Iu1oWm4C2ZcFlQkz/RVYjCH5TWWwen5ZuhwLROI7rqV+srVTyuNY7rffzpa6R9HKaoBjCYNgkHt9Y9Ph83I2YDks5bJrSw3BuB9lVd1FcXxybZg22B2I6qi6FCJNHaCRBB4v/xbsOGGvsxGtfq1EVgC5TPYaWONjOgS6wtMzi308uGXpse526Y4MuWl1kkLF9JrMhaAgfeO7MEsxzAMx5qlxqFJN8adqbQpyr10dFhuWkrPINqSupXaYXUwJfqqh60vcjfnKyElkoKxUQzQuzUYO68oOz2VCMmeIZcRtBhs1ym3XS7zvlot2u+cgQa66HrT6gJm6quutl5E3zfyf+BjlArS1GwjEgQLGDQkCL07GmQPlhWw2fBV30rHiOrzmtTB16pV8J4hMpJA43I3ntO92qynSWOOi8iTtv541xiA2fA8YnEvJdJzEY1jBQE32Uxg40ubGUY37E69z+fb+3RkzRSeJi4LY30UVi11vuZNQ9omzjvsqmtdkX+RXO4hSb2UGMwZskxU2CLoYmr5YwOje+94/QCOSNpF3pXy8XrF8SgdQr6ojXm7BjXT6IHz9u5yJhkRJJnTjB4EvBQxNBnrxmZ7v0P846967PJVltcPt3wu+6CVskPTtlssrbXOOQ0+OWClEevm3s6HgbpIZ7FkmI450Z/LK7oqx2e6egGt+R73yoPqX6v1ERdP9yiaQGrbjST9QVNiLNPxfYETk0KWuEqmYiiCjBediE3S1CVNRXizT8uqAtzCPvZZQgbd/GOLOFjJb0s01uoNuyofys5Mw/9WUXVFjpsOLRvvpqFzOG6YCyffa8mTr9XymZuFJMK4OhAOHEyJNAzcFVs+qq47VFSURcCNOIvVtEOJkchCnGHivZy0IYG94+rGE/eZxtmlQ9pFuQZWYUtCH8v/59NGJeRMNsIFKP14Ne1QJ85FsCyrUuREE79L3AfVRmv0NLGKiRYkUkm5BmWmDQn88f7w0z5peZ1YS2WJdz4vYQlKjFL3O/4cZllGYbLOKmyHlDpaPts4wUJdbQtRXCTuXKSd6or6ih+OD8tfLB90Zxx3SsyoCgc5YbE7nCxEyAWrvDHvOITQg5U251s6tZ6oS0e/1IJ7MSMt7h8elv8M+eyjHDgrccdgOU5jza62G/1zWuI4RnOKQSCr68fVVp10vuUdjfhg1cLn+uQJEf9a/5IhBV2RLGT40zljlCIa4gU1v9u5GSiphiHOOqeKaOZL9cNxdfUMlcRJqUdTq86/6KrXlJWNM1ZfKNAjpgcLrC5gzdjp9LekqUhYVV/POX4I/OfP5cPDdRvjeYdJd/65iEQJvxItkuXq5Sr0Zl5ilDjbaY7ivCGoWFV69+JCscDSfrV6tBrr2znsKZYKL77k1TmAdsqCiTmk6+mOqSh/QeF4pOU3nVzMDg9g/4GDcrV6hqq+48Ptzy+OkD7Dt0Na0JAkKx3zNNMRjSUzG46ENWRZBbkmBDB++HKu+ufpj//Uh0awDmHxeazobjuMc3qdNzSGQUo7wRZ3EatgSck6Vo5LZYv12ut4K2eomVri+vvz7cbzASbanGR1Y6Gpm8DBnhPE6azCsRLOt1WJJN0L4IhvnCJpqHp8vJECHVgFTJ/ur4PQf0+Mtr10DQGiL9Y2guiBU7zxFzDHIcXYbJnptMnKAoteOxpp7OD9p8NPyxWX9/zLHL0POxAORYkd4naYswGTNBgWcUrb5FmppsEW7JjuSSMitXG8Xi3vnaHm7ZK7/06MdBxs6BAdqdtCROHWOLXZMqRmFw1WRjLu3Q8XM1vV6uF+sQeh7yl3b3u2218PG6GvsuGU9oNQYCBVqzVTAxAaWeO5/HwfUkWnvhCM51xHMnlrdLs9gJ5/4qK3uAPFLcjQTkoElcmKKrcqwcQMRgxinHNFU8TMlwfOTLC3PB8Z2757zs+cLmQ6K1TZguR8fLTvNCTXXAQYWlxuEpjka5aRWGyeNrkYdYzN/eT59vj2ZONr79z5YThGGiqu/FquQmT4svTE58hyFkwVKbIWqfcrvPNYU0GnO6fOgZ+1amrK8+2xiQZC6uHnh8O5jEc8rh4e7u8V7TLRKTQEswrCnJCvEzfIhhzLaHmn2dML+s3z7dGJ540X3yYeDuli8z/X36UaESHqZKZTOYwUXmvEzkQWMzwr5Z0axalM9CLn/f722PYPjRcPh4awrbFPFd877CDO5XmB4XDBJmnJGkISh7v7pJYsHX/9urVUCVlrYM/fkf9he3ziaf25+/bE7SFFnbaT7nVe6jJtSjzPMPXG4W5EQjpjFJxI6cp6df34GELW8sa7rXO7IXVnwtNEePeR59Hw42oPCQNChlVrVr0rblrdqbxjvj/4v5WDd8vlw+pxtfr+/H2yO206nLznuTfZd+8hiv+lxCNesueyZ3N5HeXjhuMyDfcTHyVGA6HU6u9flx3eP0WeQixtIHzu8Yw+77v3EGV209CxouetjhtUvzpS4pEeq4maCSd6rrrJFoKwXiBC1PF47g803FMk4OCJ4ryhK4puWFUw5A4NKbrzdA1Flq7UHXSAoPqjZ3Tix/pzEleHhrAR9n2xypLjFEappvOCZgfTMJROgDDbe/mpOOitn+i/OxCObN8Z7DgnJRMIpIorW8uE2nxyyvkLpq4yGrJ42nQEEApSth9nS52vOdMQQDgy8a3+oj1zXFhS5aPj6ieoBX45er/sdAV5IitxgMsqCBfSLKcg5m2vBQzuQGZ1v7oXGoDeiN/Gxyce1j94Z9szPIShcrX89c/VL6lAVKSdOhPBgiqzrGJVEwt5nuUZxZGVArqD3/chVRxXHRbvnSriw/ERz+16jL4zMd6MOhcW3++Aja7Xv07nfmqH3H6Jz5MiOKnwvIDwjkOycH8pfzo+Pvy6sRIKRAfQ4d1/PaMeTz3N35kY8/zYf/+zS9TuXmR6Rj9vDgNC1UL4TFEFnsWvHHYO/e/h170/ngwCzpK7j8ZHPY0C8enEiOfvAQ90Quy7TIkrPUmI+ApzDJDtZxANnik6g6T0zw7xslhODbY6pC5A1EZGPteJzNOJUc+3od0FIRUiF8d/6Y1wM60LSMNzNEU/Fsj9+yJzDooqFgOzU7P161MGGBwgHBvdrhOZfwDhsIoLcvnX6sqXT7/3HBQ9DwhZTXlMU+ILRRKQFDkxZ1oXMRB6EghkUmeeNGyTSdBhE+GPE7c8/w6NetNb/3tYXu+xzIYijYy0xhCEIuUFhEiVelIaW8TAygD2ClS0pcO/AeGj4VFv395fH5znSG0pRTR2TVJeeCnvfwUOMVr/JRgUNdD89HPP+NhIA+HtiVvj40MsLuhA38ZfMqLJrKS8nKVmXwocy6ndk8JDkfsQaEY+18noI8+tcc+VFRfUQkRiMINehqmplyogFGZ6Iawv+HcNcsXdU8/YyMhEvY3hAYTbw0NYX1Ua7WWo04AQ/C+7S/mzQl+E0QOyPD504DRBcJo8nSAIbbotbntuNfU5BImRm0+4K8XeCHVGYVD2FRU0LSvtiZBy7/2eWRqEs5HwOQoIbTJKfx4uQiqwsZTa+KNndJi2rdRGqKI+OgQDPVg/37RoU/6eAD/ctsmo+NnTRDsc8X1d71PyNKyUIFTVflZqTY66B5sY++YBHdbJqPh5dHx0e3gIyWrcfld0WghVIfszRBqe6afDkHW5k2ugCtFG+M1iS3c/j3pGt4dWXFCZjHXrtEqvlZSWlaooW4KMLzBYUmd65sPYVkrMbA3QpKGohyRbjN+zqBUgHB+ZaBUX9+snvx5dz80J6eJWyFfc6xkfACHCDPvSTziNgLU+CKnQ8v4vAwG0EY6NWqOfBB2OtYqL+/XS/6ltt3cHMN9K+cNGbypp50OWcBpg3lhomy89KaEt50Vyp4qFcGTbQvj8M5jsxMP6O/ft5gb99LMFzftwEPPN/E+fAJiMcAhLAuGlgFBRpIjzaihbBmxEuf61EVoFxfNtQOipr8y4f2+CaNP7j93Y8P79eZhB1pKSjfCZSImPIaYirbY79Cl2irYResgtAiafTow3Ed6/5yEeOfltwkOi692HE0NNI0SgtpAE4KVQAVPPEKkPa/NDvZek6+7du97nj0aJH3omxbtPiY2OjNpNm/sjntHRf6jJ2x7P+MgdavKhZ4g9qrpY9SHWbISKjpCedupiDC7eh57xUQLACqb3xkc8AAoQeh7dfvgQ1DrmefT3LbJt4tvTRxO3bg0xUdoCNb4kMKqNkOcYFeFXQ71VNkE4Nj5CdEjUOD5G8IESR8Y9454RAD42AqfA0rDHM3JriJ3UuoiLmGUYFROEScwhlcE7Q703P+kjEhh1hDbSxkuCdHTMejk2Ally/BIQencUFjFq3u6XMrLQo186+BdYCG1pPhsbsWGNWxhHGhq2EA6t318X/w5CiGMshKSrLyDBedXeoOK1UyEYJSSJFlhLf9vbns4tlg5dokjToiXDGEA4qzEKK0QIGU2QeQte6jMzM4CINsIxz4/37z9/6Bkda1ro+Oid+/fv3POMtSEcHfPcuzd67/btR4/gcShz4QumxLKaYM1bhE0ks7x+aqPmXFLX4bg1n/YPIGzC8RBaQwMnH2/T7dgIxKVxiL3j42OeoSBMmiogxJZl+gtKHAl6rc/Vs2eWydv/gjy6ffveqB1IrDnRfyY8t5oYxx+S69lIu7+5abTtLyAdxmw/PVfTWUbD1gzpbA6TOWCnK4XOLZOQ8SyBRGGNeJyUDv9MjN3q1KH4L2TLTu9sPgxFh97NfBzxumFdw+ZdJHdRiBuOF7SdUybvgZnVR2o//gDk5m8IJU0kY7cn7959/ojocLSJj6TLkXHIG5Ajx4eBcCqHNSzo9YXr8wYwOLnnxbPnkcl7HisNWLncGvo9CB6eMYg0TTjj9x7dA1Iz2uQDtiN6Rm/BvmPw+WEgDGY5VRGkiH0J0FxN4mWE+04Cn1EIQlt3jdFDALHJTIPeWNvGLBYw1k4BgPbcn5y8/2h8bBgIEyaHGB7Va8KkqZBLuIcRTAEhMcSWX7X72Wg94de5ja1F6znhb/VJjb8nhmKlSVMSeEGpp8BgATMMy+WHcANwG6HNO0e7EVqoxlopYpTsMwb2CwJZf4IghIJrGAgh0EgKz+OCTdRmc3mGkTTna2fPJ7aV2obaxVtGtieAzIyCcY7b7xDXHCf8BuwTPuDxfANkrm9DQejfwTwr8I2LD8S5vKpgHr+9uCNaOiSjBZYy1oHw1sQ/z58//8fjaYbQMUgYj54T17MUOu75d8ol3oVacQgIE1mBMXSlaZYLrzWG4ZVTJtjOIhZCGDq42K0OgCOjn8n0xfOJ8Vtj9UwPYdNDmjWE4JH6wuN5+PDfR8B0hoCwZEoI61yk0SINz8iyhpnaxXN+XYdATLrI9ciYjfDz6C1Pw0NBh6S5SPgNGDZ4KPA2Qt0ujlCcz0PFq7PN5Zb+gsFLimSc9ZZ1vYUgBO/6Njk5+XS7U4cThL/dnxht6XZ0xGpHgQ5HLUcdvQUC1npxhOR+Q4jcKKnRLvZu1gQVaX2uzTurWBnf7mxPbnc44uj2U2A3T7dHm6lyFHz1G2x7fpsQb3hpsT04AxdHmMhiKJfUWis7zJkay8rsxfgmCjwAAAnPSURBVB2R6HCsgXCkSyA1eMZadf+IlfbvWYVVnSWQ9Dg+BD8sveYwq6tteBJZhBiOdVzLfi6ZJF20sR4Ix8fHuzdByugqj0eHwLxnNw1eZVQl17LJqUVD4TkOD3JH5Q6B2oJ01L49vwt+OH5Cxqz/2zeMde0wMozaAiiMpPFK+/Wi9FweC4zGX9hMJ0fHraoCKvWT+jqLgKVevD4sRQQ1zuPXybYWcGJGklRGy/98QeI2uT1hyefPE4PL6AUXbHgXscZLfGcpMbtoIBWI20UrqLt3QJ6SPz+A2H9/sJ82Nt5vSP2d+61N9n5P71xQh8EcjiNB7bwUj95NaxriUL8ZqO9GSibLIV163YllwdTiGKnGcHv71yLeV3mJheze1Tz059IyRjpyvKzk+5JwltUVRTNyXfPfwOQERdXNftOI34fs1nSM6mtn2yUxw2sSyxnDnb64BpnaMThF0oWfuq1xCkKszuF+62q+D1kwGaToev7nE/ysVMOahLX0z1f728nDFqBnGhI07EBeggVDVXltwJ/7uDGSyBosUrW0QyUoztdUGcWNyEV+XOjaxTufX0M47rwsAVKijFWZ7Xlpyfcg4SyO64hVHJu/s5t5chF7PDLMX068YhF3awoSWNb5UkMqaWJdwoxx4Rrq+oTcrU0WJOcrfu3bKmpYUCLD+23IKxZx7rWiyZKU3nTO6q6kCTmf4XHu8n40+XIlnFMEgeGYnhMU/hxmGJ4RIpewPuoqRJyPCDxiuLzjfXaI0EmTFxiWG8o01DVIIstyPLmPcO+U7s8JiGc0Nn2S8nwH4p1PyzKDeKGnCilSPCoqp8lG9ntkp9MzGMWxyv7Ub/BTr9LyGuKU9Kvvr8TwvzKwpEK2698TnZ7RNEHR4xf41cRrEnHO5JCmy/KJsqlTvJtpcvO9uHHxDv8VS6Kg6FiI4/TuKctIEwUjjhWGPf2XMG6WzG6mGQ1D9XcqIxN3IxpnyBzus7T9JsqCyQp5TUCn3AqKSDCHNV5DTP67oqfBnMFhQZPa70LXUyDtS7rAKe0/KnfTZXY+rQKl1vDLs9Tvs/M1WVVZBn8/SdFVMjUNQdlUO1sKCOcMVVlj1e+HgScKWEWkoX2WH7SiCD2d4XhWUdlajyLkpol/M82qClnWddYeE0ReSeXXZNXsdxe+GyPe+YiiSZDtzdKZhwuRSdDWIIP2/92dmyFQEcm6qnGK881Je8j0jBHXDZY13t783iKQGagVZIij50lv4u5rTVcZTsif0XevTyB/Q8mn6FKfqtBJ/K9q/BqWIf6e/6eEr1T882lWYNfW5PR5a4VwDsdVJEhr5o1O/LO7EGWUNYk9lxPaMm1iXRNUGZ8jQl25kF8DlnlFloxzOaEtYsnEcUGRWWye9oMQ1yYwRkWWMZbZM7G1bpnarcmswsvo1B/cuy6hk+RXR1SBl83kQHYGVAHFWcxqRuFGVlJ0smCw2GDiKFIaMFYEN9NxzkBxzdiZHur1l0MRETQYj2MDaendgec8w28NRkaqwOK3CzfNF+nkTwbiJAEJZ6oJewmQdk0VFEE2dpI3S4uWDyKD0Jl+v3d4ukz/hFWOUxUWws1NShrERBkBrEvKFy5ILBeyEGo0RY0b2UHd+RJkdi4LxgUhQjYGyhPtIk5n0wxk/riMs2f81evLl9ld0+DiqsIRgBcOEOI0FNAqgzGDI7s3g6P6502WxVjVGGMobQjQohFnDCzLirl7EyqN4GYNs5wBWsznhlPcEYgMB6Lh2uK1t27o6Z00q8kqxyo4lxhWgCeNcOCoksbiwjWHVG8piwUJ3Aa4yDA7ZeGdNJKxIghCOnutzuifn8G8AhmaYdObQ21ZBxfTclwG0ZjI5vVZamIzwsksy8kaTr8ZckzwvzEhpCJmTVfTO8nrWfs2VSqk43Ek85CgzWdDN6WpOaBJhoFJxTgzfw1zGnRi02ShVsKGIa9lL+Mke5MFLOuSvKbqKLI4fdXZfzZZSAu6qqqyzuVz05cS71yJ3GsuzjEK0gQD1HiVVFwEBWKVRzyUE7LxJnxZ3w1kwuBVdg2pHE7vlK7OG/1zhRqO83hNBu5hzl3iF8+SbKSwDEJcXDFfJa7GVL3JnRpmBIwUVlDzl52RE4sRReMklVX1ODbnw5ef/8FAZwxVlzBkY0mpPb70IOefMw2sSsjAccGoZXcvGSPgy6YNhcdYJi2Ll1eRqMTEYg1rDMsIgoxwJDd3iRjF8G4hzcosJwmYl3DtKmyGiB9SIyvrKhvnOAW/zs0FL+d7veHdXARDFSiruq4J+dzVMQ0xkTPTCr8mMAwvgK0W5i4h5swm5rMRAzHwJQjHcdp8c6U0w5/MgfWoDM/wUDeifGE+MdzzOzX9JmtgqCB4nkUqL9deTF81VQzu/pRXFYVnZGxw2MjPgLEOS5He8FwhYigYs4i1/N0oJK+jognuZhWV4TRB1aHmkI10dnPBf3GP9AaTi+ADbDzOAUmTIDMphdI19Rbo8BszzwLJwSAIaaxh5uanL6RJb7D0JlczsAbaE1QE9snkX85dY2PBCxjTGMlxXlAUrEsI5yMv3ySDs4PwRnoquPDmZSSPOU1XQPg4h3H65bNLitRnFS9EvLQiwaA0jEhpKhhGxHzxLBGcOs/AvFPB6WcvzHQeyISmcQridI2VlMi147MGF372kthVHGEFQXAXWI6oMvvi2XQ4OHvq+FzirD+88PjFy1oekw6TKiAWkS40TtdeJAf9DZ8hi+hPvjDzihLXya8MyqwiazpUqvmIWXgxn0yE/bNeUez8TW4XLYqgt3Bi+hmAM0leV6W4zAM6QdJ1sNK8+ThxM9qztnjDpZevDaQDu4IYoSCFkTkIhBI2ajXz5YsXm/PzpeT0dILI9EIyObc7v7iYK2TNWtrAkiTxwAAVSA1IsU6PEXmRvAHm2SVTiccvIxBvWE7nEcIGlDqI0UAk0Cc20iCRSC1i1sjfdJo0RAQo2XVJYwQkIBKOGYHnZBWDdQ4ttQ5ZphJzEAsRBzQSzJS4JGgFzE5FrKRJEEI0TuU5iYiu6pALJJLS11hBUHgJVKfHOXC+Z+EbCs8ScSoMPlkzWHIjKuCsEnBK0BUPWkVQN7MkC4DqyEusAjBQHPnFMGB/KrHol4+ng7M3I7j0EZfXCvyv80ArIWiAlXKQLYmPgT6xLUgQAL7AESPW4pqqGARdMjEESnRFQs8GE88gRqaNPERJME7ijpIEoUdiCA8D6+XItjiDDeP//fe/j58tJPzemzXLfLrQVhYnuaBWew1AFTIpQJQIDxjn80a6Vnv5X4AWnPJ6B/mNlxsitNcPWc/KEM+ePXtsCTx5tjCdCIeDUzff6c4ljbvo0vRV4vr//wggcnoCOTQAAAAASUVORK5CYII=" alt="Эмблема Минрайтеплосети" />
+    <div>
+      <h1>Минрайтеплосеть</h1>
+      <p><strong>РСУ • Вечерний отчёт v3</strong></p>
+      <p>Форма для бригадиров. Заполняй без лишней суеты: только то, что реально было за день.</p>
+      <span class="pill">Аналитика • Материалы • Техника • Фото</span>
     </div>
   </div>
 
-  <div class="card">
-    <h2>3. План-факт</h2>
-    <label>Что было запланировано на сегодня</label>
-    <textarea id="plannedToday" required></textarea>
-
-    <label>Что реально выполнено сегодня</label>
-    <textarea id="completedToday" required></textarea>
-
-    <div id="planProblemsBlock" class="hidden">
-      <label>Что не выполнено / не успели</label>
-      <textarea id="unfinishedWork"></textarea>
-
-      <label>Причина отклонения</label>
-      <select id="planIssueReason">
+  <form id="reportForm">
+    <div class="card">
+      <h2>1. Направление работ</h2>
+      <label>Выбери направление</label>
+      <select id="direction" required>
         <option value="">Выбери</option>
-        <option>Не хватило людей</option>
-        <option>Не хватило материала</option>
-        <option>Не хватило инструмента</option>
-        <option>Не было техники</option>
-        <option>Погода</option>
-        <option>Не было доступа</option>
-        <option>Мешали смежники</option>
-        <option>Аварийный вызов</option>
-        <option>Скрытые дефекты</option>
-        <option>Другое</option>
+        <option value="heating_main">Теплотрасса</option>
+        <option value="boiler_ctp">Котельная / ЦТП</option>
+        <option value="finish">Отделка / ремонт помещения</option>
+        <option value="landscaping">Благоустройство / дорога / тротуар</option>
+        <option value="bathhouse">Баня</option>
+        <option value="reconstruction">Реконструкция</option>
+        <option value="emergency">Аварийные работы</option>
+        <option value="other">Прочее</option>
       </select>
     </div>
-  </div>
 
-  <div class="card">
-    <h2>4. Паспорт направления</h2>
+    <div class="card">
+      <h2>2. Общая шапка</h2>
 
-    <div id="heatFields" class="hidden">
-      <label>Участок / камера / привязка</label>
-      <input id="heat_zone" />
+      <label>Бригада</label>
+      <select id="brigade" required>
+        <option value="">Выбери</option>
+        <option>Теплотрасса</option>
+        <option>Отделочники</option>
+        <option>Котельные</option>
+        <option>Фасад</option>
+      </select>
+
+      <label>Тип объекта</label>
+      <select id="objectType" required>
+        <option value="">Выбери</option>
+        <option value="boiler_house">Котельная</option>
+        <option value="ctp">ЦТП</option>
+        <option value="heating_main">Теплотрасса</option>
+        <option value="bathhouse">Баня</option>
+        <option value="road">Дорога / тротуар</option>
+        <option value="building">Здание / помещение</option>
+        <option value="reconstruction">Реконструкция</option>
+        <option value="other">Другое</option>
+      </select>
+
+      <label>Объект</label>
+      <input id="objectName" placeholder="Напр: Котельная №17 / Теплотрасса ул. Ленина" required />
+
+      <label>Адрес / участок</label>
+      <input id="objectAddress" placeholder="Напр: Заславль, ул. Ленина / ТК-1 — ТК-2" />
+
       <div class="row">
         <div>
-          <label>Тип сети</label>
-          <select id="heat_network_type">
+          <label>Дата</label>
+          <input type="date" id="reportDate" required />
+        </div>
+        <div>
+          <label>Сколько человек вышло</label>
+          <input type="number" id="workersCount" min="1" required />
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label>Смена</label>
+          <select id="shiftType">
             <option value="">Выбери</option>
-            <option>Канальная</option>
-            <option>Бесканальная</option>
-            <option>Надземная</option>
+            <option value="day">Дневная</option>
+            <option value="evening">Вечерняя</option>
+            <option value="emergency">Аварийная</option>
           </select>
         </div>
         <div>
-          <label>Диаметр трубы</label>
-          <input id="heat_pipe_diameter" placeholder="Напр: 57 / 89 / 108" />
+          <label>План выполнен?</label>
+          <select id="planStatus" required>
+            <option value="">Выбери</option>
+            <option value="yes">Да</option>
+            <option value="partial">Частично</option>
+            <option value="no">Нет</option>
+          </select>
         </div>
       </div>
-      <div class="row">
-        <div>
-          <label>Длина участка за день, м</label>
-          <input type="number" step="0.01" id="heat_length_m" />
-        </div>
-        <div>
-          <label>Количество стыков</label>
-          <input type="number" id="heat_joints_count" />
-        </div>
-      </div>
-      <label>Были ли лотки / плиты / камеры</label>
-      <input id="heat_structures" placeholder="Напр: 4 лотка, 2 плиты, ТК-3" />
-      <label>Была ли вода / пересечения / особые условия</label>
-      <input id="heat_conditions" />
     </div>
 
-    <div id="boilerFields" class="hidden">
-      <label>Зона</label>
-      <input id="boiler_zone" placeholder="Напр: котловой зал, насосная, узел учета" />
-      <label>Оборудование / система</label>
-      <input id="boiler_equipment" placeholder="Напр: котел, насос, трубопровод, КИПиА" />
-      <label>Критично ли для запуска / работы</label>
-      <select id="boiler_critical">
-        <option value="">Выбери</option>
-        <option>Да</option>
-        <option>Нет</option>
+    <div class="card">
+      <h2>3. План-факт</h2>
+
+      <label>Что было запланировано на сегодня</label>
+      <textarea id="plannedToday" required></textarea>
+
+      <label>Что реально выполнено сегодня</label>
+      <textarea id="completedToday" required></textarea>
+
+      <div id="planProblemsBlock" class="hidden">
+        <label>Что не выполнено / не успели</label>
+        <textarea id="unfinishedWork"></textarea>
+
+        <label>Причина отклонения</label>
+        <select id="planIssueReason">
+          <option value="">Выбери</option>
+          <option>Не хватило людей</option>
+          <option>Не хватило материала</option>
+          <option>Не хватило инструмента</option>
+          <option>Не было техники</option>
+          <option>Погода</option>
+          <option>Не было доступа</option>
+          <option>Мешали смежники</option>
+          <option>Аварийный вызов</option>
+          <option>Скрытые дефекты</option>
+          <option>Другое</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>4. Паспорт направления</h2>
+
+      <div id="heatFields" class="hidden">
+        <label>Участок / камера / привязка</label>
+        <input id="heat_zone" />
+
+        <div class="row">
+          <div>
+            <label>Тип сети</label>
+            <select id="heat_network_type">
+              <option value="">Выбери</option>
+              <option>Канальная</option>
+              <option>Бесканальная</option>
+              <option>Надземная</option>
+            </select>
+          </div>
+          <div>
+            <label>Диаметр трубы</label>
+            <input id="heat_pipe_diameter" placeholder="Напр: 57 / 89 / 108" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label>Длина участка за день, м</label>
+            <input type="number" step="0.01" id="heat_length_m" />
+          </div>
+          <div>
+            <label>Количество стыков</label>
+            <input type="number" id="heat_joints_count" />
+          </div>
+        </div>
+
+        <label>Были ли лотки / плиты / камеры</label>
+        <input id="heat_structures" placeholder="Напр: 4 лотка, 2 плиты, ТК-3" />
+
+        <label>Была ли вода / пересечения / особые условия</label>
+        <input id="heat_conditions" />
+      </div>
+
+      <div id="boilerFields" class="hidden">
+        <label>Зона</label>
+        <input id="boiler_zone" placeholder="Напр: котловой зал, насосная, узел учета" />
+
+        <label>Оборудование / система</label>
+        <input id="boiler_equipment" placeholder="Напр: котел, насос, трубопровод, КИПиА" />
+
+        <label>Критично ли для запуска / работы</label>
+        <select id="boiler_critical">
+          <option value="">Выбери</option>
+          <option>Да</option>
+          <option>Нет</option>
+        </select>
+      </div>
+
+      <div id="finishFields" class="hidden">
+        <label>Помещение / зона</label>
+        <input id="finish_zone" />
+
+        <label>Стадия</label>
+        <select id="finish_stage">
+          <option value="">Выбери</option>
+          <option>Подготовка</option>
+          <option>Черновые</option>
+          <option>Чистовые</option>
+          <option>Завершение</option>
+        </select>
+      </div>
+
+      <div id="landFields" class="hidden">
+        <label>Участок</label>
+        <input id="land_zone" />
+
+        <label>Нужен ли вывоз грунта / мусора</label>
+        <select id="land_export">
+          <option value="">Выбери</option>
+          <option>Да</option>
+          <option>Нет</option>
+        </select>
+      </div>
+
+      <div id="bathFields" class="hidden">
+        <label>Зона</label>
+        <input id="bath_zone" />
+
+        <label>Фокус работ</label>
+        <input id="bath_focus" placeholder="Напр: плитка, гидроизоляция, сантехника" />
+      </div>
+
+      <div id="reconFields" class="hidden">
+        <label>Этап реконструкции</label>
+        <input id="recon_stage" placeholder="Напр: демонтаж, монтаж, врезка, наладка" />
+
+        <label>Ключевой узел / зона</label>
+        <input id="recon_zone" />
+      </div>
+
+      <div id="emergencyFields" class="hidden">
+        <label>Тип аварии</label>
+        <input id="emergency_type" />
+
+        <div class="row">
+          <div>
+            <label>Время выезда</label>
+            <input id="emergency_departure_time" placeholder="Напр: 14:20" />
+          </div>
+          <div>
+            <label>Время локализации</label>
+            <input id="emergency_localized_time" placeholder="Напр: 15:05" />
+          </div>
+        </div>
+
+        <label>Что повреждено</label>
+        <input id="emergency_damage" />
+      </div>
+
+      <div id="otherFields" class="hidden">
+        <label>Коротко опиши направление / специфику работ</label>
+        <textarea id="other_meta"></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>5. Выполненные работы</h2>
+      <div class="hint">Минимум одна строка. Пиши объём, чтобы потом была нормальная аналитика.</div>
+      <div id="worksContainer"></div>
+      <button type="button" class="btn-secondary" onclick="addWork()">+ Добавить работу</button>
+    </div>
+
+    <div class="card">
+      <h2>6. Люди и привлечённые силы</h2>
+      <label>Привлекались дополнительные люди / силы?</label>
+      <select id="extraPeopleFlag">
+        <option value="no">Нет</option>
+        <option value="yes">Да</option>
+      </select>
+      <div id="peopleBlock" class="hidden">
+        <div id="peopleContainer"></div>
+        <button type="button" class="btn-secondary" onclick="addPeopleResource()">+ Добавить ресурс</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>7. Спецтехника и механизация</h2>
+      <label>Привлекалась спецтехника?</label>
+      <select id="equipmentFlag">
+        <option value="no">Нет</option>
+        <option value="yes">Да</option>
+      </select>
+      <div id="equipmentBlock" class="hidden">
+        <div id="equipmentContainer"></div>
+        <button type="button" class="btn-secondary" onclick="addEquipment()">+ Добавить технику</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>8. Материалы</h2>
+
+      <label>Было на объекте до начала работ?</label>
+      <select id="hadOnObject">
+        <option value="no">Нет</option>
+        <option value="yes">Да</option>
+      </select>
+      <div id="hadOnObjectBlock" class="hidden">
+        <div id="materialsHadContainer"></div>
+        <button type="button" class="btn-secondary" onclick="addMaterial('had_on_object')">+ Добавить</button>
+      </div>
+
+      <label>Приехало сегодня?</label>
+      <select id="arrivedToday">
+        <option value="no">Нет</option>
+        <option value="yes">Да</option>
+      </select>
+      <div id="arrivedTodayBlock" class="hidden">
+        <div id="materialsArrivedContainer"></div>
+        <button type="button" class="btn-secondary" onclick="addMaterial('arrived_today')">+ Добавить</button>
+      </div>
+
+      <label>Использовали сегодня?</label>
+      <select id="usedToday">
+        <option value="no">Нет</option>
+        <option value="yes">Да</option>
+      </select>
+      <div id="usedTodayBlock" class="hidden">
+        <div id="materialsUsedContainer"></div>
+        <button type="button" class="btn-secondary" onclick="addMaterial('used_today')">+ Добавить</button>
+      </div>
+
+      <label>Не хватает на завтра?</label>
+      <select id="needTomorrowFlag">
+        <option value="no">Нет</option>
+        <option value="yes">Да</option>
+      </select>
+      <div id="needTomorrowBlock" class="hidden">
+        <div id="materialsNeedTomorrowContainer"></div>
+        <button type="button" class="btn-secondary" onclick="addMaterial('need_tomorrow')">+ Добавить</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>9. Инструмент / инвентарь: только проблемы</h2>
+      <div class="hint">Тут не полный учёт. Только то, что болит: сломалось, не хватает, осталось на объекте, пропало.</div>
+
+      <label>Есть проблемы по инструменту / инвентарю?</label>
+      <select id="assetIssuesFlag">
+        <option value="no">Нет</option>
+        <option value="yes">Да</option>
+      </select>
+      <div id="assetIssuesBlock" class="hidden">
+        <div id="assetIssuesContainer"></div>
+        <button type="button" class="btn-secondary" onclick="addAssetIssue()">+ Добавить проблему</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>10. Проблемы / ограничения / риски на объекте</h2>
+      <label>Были проблемы по объекту?</label>
+      <select id="siteIssuesFlag">
+        <option value="no">Нет</option>
+        <option value="yes">Да</option>
+      </select>
+      <div id="siteIssuesBlock" class="hidden">
+        <div id="siteIssuesContainer"></div>
+        <button type="button" class="btn-secondary" onclick="addSiteIssue()">+ Добавить проблему</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>11. План на завтра</h2>
+      <label>Что делаете завтра</label>
+      <textarea id="tomorrowPlan" required></textarea>
+
+      <label>Что нужно на завтра</label>
+      <textarea id="tomorrowNeeds" placeholder="Материалы, техника, инструмент, люди, доступ, согласование..."></textarea>
+
+      <label>Какие риски на завтра</label>
+      <textarea id="tomorrowRisksText" placeholder="Что может сорвать план"></textarea>
+
+      <label>Нужна реакция руководителя?</label>
+      <select id="needBossReaction">
+        <option value="no">Нет</option>
+        <option value="yes">Да</option>
       </select>
     </div>
 
-    <div id="finishFields" class="hidden">
-      <label>Помещение / зона</label>
-      <input id="finish_zone" />
-      <label>Стадия</label>
-      <select id="finish_stage">
-        <option value="">Выбери</option>
-        <option>Подготовка</option>
-        <option>Черновые</option>
-        <option>Чистовые</option>
-        <option>Завершение</option>
-      </select>
-    </div>
+    <button type="submit" class="submit-btn">Отправить отчёт</button>
+  </form>
 
-    <div id="landFields" class="hidden">
-      <label>Участок</label>
-      <input id="land_zone" />
-      <label>Нужен ли вывоз грунта / мусора</label>
-      <select id="land_export">
-        <option value="">Выбери</option>
-        <option>Да</option>
-        <option>Нет</option>
-      </select>
-    </div>
+  <script>
+    const tg = window.Telegram.WebApp;
+    tg.expand();
 
-    <div id="bathFields" class="hidden">
-      <label>Зона</label>
-      <input id="bath_zone" />
-      <label>Фокус работ</label>
-      <input id="bath_focus" placeholder="Напр: плитка, гидроизоляция, сантехника" />
-    </div>
+    const WORK_TYPES = ["Демонтаж","Монтаж","Ремонт","Сварка","Изоляция","Испытание","Засыпка","Благоустройство","Штукатурка","Шпаклёвка","Покраска","Плитка","Сантехника","Электрика","Прочее"];
+    const UNITS = ["шт","м","м²","м³","кг","мешок","упак","л","т","компл","узел","стык"];
+    const WORK_STATUS = ["Завершено","В процессе","Подготовлено под следующий этап"];
+    const PEOPLE_TYPES = ["Другая бригада РСУ","АДС","Котельные","Подрядчик","Смежники","Другое"];
+    const EQUIPMENT_TYPES = ["JCB / экскаватор-погрузчик","Экскаватор","Погрузчик","Трактор","Самосвал","Манипулятор","Автокран","Автовышка","Насос / откачка","Сварочный агрегат / генератор","Другое"];
+    const OWNERSHIP = ["Своя","Другое подразделение","Подрядчик / аренда"];
+    const ENOUGH = ["Да","Нет"];
+    const ASSET_CATEGORIES = ["Электроинструмент","Ручной инструмент","Леса","Лестница / вышка","Удлинитель","Насос","Сварочное","Другое"];
+    const ASSET_PROBLEMS = ["Неисправно","Не хватает","Осталось на объекте","Отсутствует"];
+    const CRITICALITY = ["Стоп-работа","Влияет","Некритично"];
+    const SITE_ISSUES = ["Нет материала","Нет техники","Нет инструмента","Не хватает людей","Нет доступа","Вода / грунтовые воды","Скрытые дефекты","Мешают смежники","Погода","Аварийная ситуация","Другое"];
+    const SEVERITY = ["Высокая","Средняя","Низкая"];
 
-    <div id="reconFields" class="hidden">
-      <label>Этап реконструкции</label>
-      <input id="recon_stage" placeholder="Напр: демонтаж, монтаж, врезка, наладка" />
-      <label>Ключевой узел / зона</label>
-      <input id="recon_zone" />
-    </div>
+    function setToday() {
+      document.getElementById("reportDate").value = new Date().toISOString().split("T")[0];
+    }
 
-    <div id="emergencyFields" class="hidden">
-      <label>Тип аварии</label>
-      <input id="emergency_type" />
-      <div class="row">
-        <div>
-          <label>Время выезда</label>
-          <input id="emergency_departure_time" placeholder="Напр: 14:20" />
+    function createSelect(options) {
+      const s = document.createElement("select");
+      const o0 = document.createElement("option");
+      o0.value = "";
+      o0.textContent = "Выбери";
+      s.appendChild(o0);
+      options.forEach(v => {
+        const o = document.createElement("option");
+        o.value = v;
+        o.textContent = v;
+        s.appendChild(o);
+      });
+      return s;
+    }
+
+    function hideDirectionBlocks() {
+      ["heatFields","boilerFields","finishFields","landFields","bathFields","reconFields","emergencyFields","otherFields"]
+        .forEach(id => document.getElementById(id).classList.add("hidden"));
+    }
+
+    function onDirectionChange() {
+      hideDirectionBlocks();
+      const v = document.getElementById("direction").value;
+      if (v === "heating_main") document.getElementById("heatFields").classList.remove("hidden");
+      if (v === "boiler_ctp") document.getElementById("boilerFields").classList.remove("hidden");
+      if (v === "finish") document.getElementById("finishFields").classList.remove("hidden");
+      if (v === "landscaping") document.getElementById("landFields").classList.remove("hidden");
+      if (v === "bathhouse") document.getElementById("bathFields").classList.remove("hidden");
+      if (v === "reconstruction") document.getElementById("reconFields").classList.remove("hidden");
+      if (v === "emergency") document.getElementById("emergencyFields").classList.remove("hidden");
+      if (v === "other") document.getElementById("otherFields").classList.remove("hidden");
+    }
+
+    function addWork() {
+      const c = document.getElementById("worksContainer");
+      const item = document.createElement("div");
+      item.className = "item";
+      item.innerHTML = `
+        <label>Зона / участок</label>
+        <input class="w-zone" />
+        <label>Вид работы</label>
+        <div class="w-type"></div>
+        <div class="row">
+          <div>
+            <label>Объём</label>
+            <input type="number" step="0.01" class="w-vol" />
+          </div>
+          <div>
+            <label>Ед. изм.</label>
+            <div class="w-unit"></div>
+          </div>
         </div>
-        <div>
-          <label>Время локализации</label>
-          <input id="emergency_localized_time" placeholder="Напр: 15:05" />
+        <label>Статус</label>
+        <div class="w-status"></div>
+        <label>Комментарий</label>
+        <textarea class="w-comment"></textarea>
+        <button type="button" class="btn-danger">Удалить</button>
+      `;
+      item.querySelector(".w-type").appendChild(createSelect(WORK_TYPES));
+      item.querySelector(".w-type select").className = "w-type-sel";
+      item.querySelector(".w-unit").appendChild(createSelect(UNITS));
+      item.querySelector(".w-unit select").className = "w-unit-sel";
+      item.querySelector(".w-status").appendChild(createSelect(WORK_STATUS));
+      item.querySelector(".w-status select").className = "w-status-sel";
+      item.querySelector(".btn-danger").addEventListener("click", () => item.remove());
+      c.appendChild(item);
+    }
+
+    function addPeopleResource() {
+      const c = document.getElementById("peopleContainer");
+      const item = document.createElement("div");
+      item.className = "item";
+      item.innerHTML = `
+        <label>Тип ресурса</label>
+        <div class="p-type"></div>
+        <label>Кто именно / источник</label>
+        <input class="p-source" placeholder="Напр: АДС, бригада котельных, подрядчик Иванов" />
+        <div class="row">
+          <div>
+            <label>Сколько человек</label>
+            <input type="number" class="p-count" min="1" />
+          </div>
+          <div>
+            <label>Причина привлечения</label>
+            <input class="p-reason" placeholder="Напр: сварка, раскопка, усиление" />
+          </div>
         </div>
-      </div>
-      <label>Что повреждено</label>
-      <input id="emergency_damage" />
-    </div>
-  </div>
+        <label>Комментарий</label>
+        <input class="p-comment" />
+        <button type="button" class="btn-danger">Удалить</button>
+      `;
+      item.querySelector(".p-type").appendChild(createSelect(PEOPLE_TYPES));
+      item.querySelector(".p-type select").className = "p-type-sel";
+      item.querySelector(".btn-danger").addEventListener("click", () => item.remove());
+      c.appendChild(item);
+    }
 
-  <div class="card">
-    <h2>5. Выполненные работы</h2>
-    <div class="hint">Минимум одна строка.</div>
-    <div id="worksContainer"></div>
-    <button type="button" class="btn-secondary" onclick="addWork()">+ Добавить работу</button>
-  </div>
+    function addEquipment() {
+      const c = document.getElementById("equipmentContainer");
+      const item = document.createElement("div");
+      item.className = "item";
+      item.innerHTML = `
+        <label>Тип техники</label>
+        <div class="e-type"></div>
+        <div class="row">
+          <div>
+            <label>Чья техника</label>
+            <div class="e-owner"></div>
+          </div>
+          <div>
+            <label>Часы работы</label>
+            <input type="number" step="0.1" class="e-hours" />
+          </div>
+        </div>
+        <label>Для чего использовалась</label>
+        <input class="e-purpose" placeholder="Напр: раскопка, подача материалов, вывоз грунта" />
+        <div class="row">
+          <div>
+            <label>Хватило?</label>
+            <div class="e-enough"></div>
+          </div>
+          <div>
+            <label>Нужна завтра?</label>
+            <div class="e-tomorrow"></div>
+          </div>
+        </div>
+        <label>Комментарий</label>
+        <input class="e-comment" />
+        <button type="button" class="btn-danger">Удалить</button>
+      `;
+      item.querySelector(".e-type").appendChild(createSelect(EQUIPMENT_TYPES));
+      item.querySelector(".e-type select").className = "e-type-sel";
+      item.querySelector(".e-owner").appendChild(createSelect(OWNERSHIP));
+      item.querySelector(".e-owner select").className = "e-owner-sel";
+      item.querySelector(".e-enough").appendChild(createSelect(ENOUGH));
+      item.querySelector(".e-enough select").className = "e-enough-sel";
+      item.querySelector(".e-tomorrow").appendChild(createSelect(ENOUGH));
+      item.querySelector(".e-tomorrow select").className = "e-tomorrow-sel";
+      item.querySelector(".btn-danger").addEventListener("click", () => item.remove());
+      c.appendChild(item);
+    }
 
-  <div class="card">
-    <h2>6. Люди и привлечённые силы</h2>
-    <label>Привлекались дополнительные люди / силы?</label>
-    <select id="extraPeopleFlag">
-      <option value="no">Нет</option>
-      <option value="yes">Да</option>
-    </select>
-    <div id="peopleBlock" class="hidden">
-      <div id="peopleContainer"></div>
-      <button type="button" class="btn-secondary" onclick="addPeopleResource()">+ Добавить ресурс</button>
-    </div>
-  </div>
+    function addMaterial(section) {
+      const map = {
+        "had_on_object": "materialsHadContainer",
+        "arrived_today": "materialsArrivedContainer",
+        "used_today": "materialsUsedContainer",
+        "need_tomorrow": "materialsNeedTomorrowContainer",
+      };
+      const c = document.getElementById(map[section]);
+      const item = document.createElement("div");
+      item.className = "item";
+      item.innerHTML = `
+        <label>Материал</label>
+        <input class="m-name" placeholder="Напр: цемент М500, труба 89, песок" />
+        <div class="row">
+          <div>
+            <label>Количество</label>
+            <input type="number" step="0.01" class="m-qty" />
+          </div>
+          <div>
+            <label>Ед. изм.</label>
+            <div class="m-unit"></div>
+          </div>
+        </div>
+        <label>Источник / тип поступления</label>
+        <input class="m-source" placeholder="Склад / поставщик / другой объект / остаток" />
+        <label>Критичность</label>
+        <div class="m-criticality"></div>
+        <label>Комментарий</label>
+        <input class="m-comment" />
+        <button type="button" class="btn-danger">Удалить</button>
+      `;
+      item.querySelector(".m-unit").appendChild(createSelect(UNITS));
+      item.querySelector(".m-unit select").className = "m-unit-sel";
+      item.querySelector(".m-criticality").appendChild(createSelect(CRITICALITY));
+      item.querySelector(".m-criticality select").className = "m-criticality-sel";
+      item.querySelector(".btn-danger").addEventListener("click", () => item.remove());
+      item.dataset.section = section;
+      c.appendChild(item);
+    }
 
-  <div class="card">
-    <h2>7. Спецтехника и механизация</h2>
-    <label>Привлекалась спецтехника?</label>
-    <select id="equipmentFlag">
-      <option value="no">Нет</option>
-      <option value="yes">Да</option>
-    </select>
-    <div id="equipmentBlock" class="hidden">
-      <div id="equipmentContainer"></div>
-      <button type="button" class="btn-secondary" onclick="addEquipment()">+ Добавить технику</button>
-    </div>
-  </div>
+    function addAssetIssue() {
+      const c = document.getElementById("assetIssuesContainer");
+      const item = document.createElement("div");
+      item.className = "item";
+      item.innerHTML = `
+        <label>Категория</label>
+        <div class="a-category"></div>
+        <label>Проблема</label>
+        <div class="a-problem"></div>
+        <label>Что именно</label>
+        <input class="a-name" placeholder="Напр: перфоратор Makita, леса комплект 2" />
+        <label>Критичность</label>
+        <div class="a-criticality"></div>
+        <label>Комментарий</label>
+        <input class="a-comment" />
+        <button type="button" class="btn-danger">Удалить</button>
+      `;
+      item.querySelector(".a-category").appendChild(createSelect(ASSET_CATEGORIES));
+      item.querySelector(".a-category select").className = "a-category-sel";
+      item.querySelector(".a-problem").appendChild(createSelect(ASSET_PROBLEMS));
+      item.querySelector(".a-problem select").className = "a-problem-sel";
+      item.querySelector(".a-criticality").appendChild(createSelect(CRITICALITY));
+      item.querySelector(".a-criticality select").className = "a-criticality-sel";
+      item.querySelector(".btn-danger").addEventListener("click", () => item.remove());
+      c.appendChild(item);
+    }
 
-  <div class="card">
-    <h2>8. Материалы</h2>
+    function addSiteIssue() {
+      const c = document.getElementById("siteIssuesContainer");
+      const item = document.createElement("div");
+      item.className = "item";
+      item.innerHTML = `
+        <label>Тип проблемы</label>
+        <div class="s-type"></div>
+        <label>Серьёзность</label>
+        <div class="s-severity"></div>
+        <label>Комментарий</label>
+        <textarea class="s-comment"></textarea>
+        <label>Нужна реакция руководителя?</label>
+        <div class="s-boss"></div>
+        <button type="button" class="btn-danger">Удалить</button>
+      `;
+      item.querySelector(".s-type").appendChild(createSelect(SITE_ISSUES));
+      item.querySelector(".s-type select").className = "s-type-sel";
+      item.querySelector(".s-severity").appendChild(createSelect(SEVERITY));
+      item.querySelector(".s-severity select").className = "s-severity-sel";
+      item.querySelector(".s-boss").appendChild(createSelect(["yes","no"]));
+      item.querySelector(".s-boss select").className = "s-boss-sel";
+      item.querySelector(".btn-danger").addEventListener("click", () => item.remove());
+      c.appendChild(item);
+    }
 
-    <label>Было на объекте до начала работ?</label>
-    <select id="hadOnObject">
-      <option value="no">Нет</option>
-      <option value="yes">Да</option>
-    </select>
-    <div id="hadOnObjectBlock" class="hidden">
-      <div id="materialsHadContainer"></div>
-      <button type="button" class="btn-secondary" onclick="addMaterial('had_on_object')">+ Добавить</button>
-    </div>
+    function getDirectionMeta() {
+      const direction = document.getElementById("direction").value;
+      const meta = {};
 
-    <label>Приехало сегодня?</label>
-    <select id="arrivedToday">
-      <option value="no">Нет</option>
-      <option value="yes">Да</option>
-    </select>
-    <div id="arrivedTodayBlock" class="hidden">
-      <div id="materialsArrivedContainer"></div>
-      <button type="button" class="btn-secondary" onclick="addMaterial('arrived_today')">+ Добавить</button>
-    </div>
+      if (direction === "heating_main") {
+        meta.heat_zone = document.getElementById("heat_zone").value.trim();
+        meta.heat_network_type = document.getElementById("heat_network_type").value;
+        meta.heat_pipe_diameter = document.getElementById("heat_pipe_diameter").value.trim();
+        meta.heat_length_m = document.getElementById("heat_length_m").value;
+        meta.heat_joints_count = document.getElementById("heat_joints_count").value;
+        meta.heat_structures = document.getElementById("heat_structures").value.trim();
+        meta.heat_conditions = document.getElementById("heat_conditions").value.trim();
+      }
+      if (direction === "boiler_ctp") {
+        meta.boiler_zone = document.getElementById("boiler_zone").value.trim();
+        meta.boiler_equipment = document.getElementById("boiler_equipment").value.trim();
+        meta.boiler_critical = document.getElementById("boiler_critical").value;
+      }
+      if (direction === "finish") {
+        meta.finish_zone = document.getElementById("finish_zone").value.trim();
+        meta.finish_stage = document.getElementById("finish_stage").value;
+      }
+      if (direction === "landscaping") {
+        meta.land_zone = document.getElementById("land_zone").value.trim();
+        meta.land_export = document.getElementById("land_export").value;
+      }
+      if (direction === "bathhouse") {
+        meta.bath_zone = document.getElementById("bath_zone").value.trim();
+        meta.bath_focus = document.getElementById("bath_focus").value.trim();
+      }
+      if (direction === "reconstruction") {
+        meta.recon_stage = document.getElementById("recon_stage").value.trim();
+        meta.recon_zone = document.getElementById("recon_zone").value.trim();
+      }
+      if (direction === "emergency") {
+        meta.emergency_type = document.getElementById("emergency_type").value.trim();
+        meta.emergency_departure_time = document.getElementById("emergency_departure_time").value.trim();
+        meta.emergency_localized_time = document.getElementById("emergency_localized_time").value.trim();
+        meta.emergency_damage = document.getElementById("emergency_damage").value.trim();
+      }
+      if (direction === "other") {
+        meta.other_meta = document.getElementById("other_meta").value.trim();
+      }
 
-    <label>Использовали сегодня?</label>
-    <select id="usedToday">
-      <option value="no">Нет</option>
-      <option value="yes">Да</option>
-    </select>
-    <div id="usedTodayBlock" class="hidden">
-      <div id="materialsUsedContainer"></div>
-      <button type="button" class="btn-secondary" onclick="addMaterial('used_today')">+ Добавить</button>
+      return meta;
+    }
+
+    function getWorks() {
+      return [...document.querySelectorAll("#worksContainer .item")].map(it => ({
+        zone: it.querySelector(".w-zone").value.trim(),
+        work_type: it.querySelector(".w-type-sel").value,
+        volume: it.querySelector(".w-vol").value,
+        unit: it.querySelector(".w-unit-sel").value,
+        work_status: it.querySelector(".w-status-sel").value,
+        comment: it.querySelector(".w-comment").value.trim()
+      })).filter(x => x.zone || x.work_type || x.volume || x.comment);
+    }
+
+    function getPeopleResources() {
+      return [...document.querySelectorAll("#peopleContainer .item")].map(it => ({
+        resource_type: it.querySelector(".p-type-sel").value,
+        source_name: it.querySelector(".p-source").value.trim(),
+        people_count: it.querySelector(".p-count").value,
+        reason: it.querySelector(".p-reason").value.trim(),
+        comment: it.querySelector(".p-comment").value.trim()
+      })).filter(x => x.resource_type || x.source_name || x.people_count || x.reason || x.comment);
+    }
+
+    function getEquipmentUsed() {
+      return [...document.querySelectorAll("#equipmentContainer .item")].map(it => ({
+        equipment_type: it.querySelector(".e-type-sel").value,
+        ownership: it.querySelector(".e-owner-sel").value,
+        hours_used: it.querySelector(".e-hours").value,
+        purpose: it.querySelector(".e-purpose").value.trim(),
+        enough_flag: it.querySelector(".e-enough-sel").value,
+        needed_tomorrow: it.querySelector(".e-tomorrow-sel").value,
+        comment: it.querySelector(".e-comment").value.trim()
+      })).filter(x => x.equipment_type || x.ownership || x.hours_used || x.purpose || x.comment);
+    }
+
+    function getMaterials() {
+      return [...document.querySelectorAll("#materialsHadContainer .item, #materialsArrivedContainer .item, #materialsUsedContainer .item, #materialsNeedTomorrowContainer .item")]
+        .map(it => ({
+          section: it.dataset.section,
+          raw_name: it.querySelector(".m-name").value.trim(),
+          qty: it.querySelector(".m-qty").value,
+          unit: it.querySelector(".m-unit-sel").value,
+          source_type: it.querySelector(".m-source").value.trim(),
+          criticality: it.querySelector(".m-criticality-sel").value,
+          comment: it.querySelector(".m-comment").value.trim()
+        }))
+        .filter(x => x.raw_name || x.qty || x.comment);
+    }
+
+    function getAssetIssues() {
+      return [...document.querySelectorAll("#assetIssuesContainer .item")].map(it => ({
+        category: it.querySelector(".a-category-sel").value,
+        problem: it.querySelector(".a-problem-sel").value,
+        asset_name: it.querySelector(".a-name").value.trim(),
+        criticality: it.querySelector(".a-criticality-sel").value,
+        comment: it.querySelector(".a-comment").value.trim()
+      })).filter(x => x.category || x.problem || x.asset_name || x.comment);
+    }
+
+    function getSiteIssues() {
+      return [...document.querySelectorAll("#siteIssuesContainer .item")].map(it => ({
+        issue_type: it.querySelector(".s-type-sel").value,
+        severity: it.querySelector(".s-severity-sel").value,
+        comment: it.querySelector(".s-comment").value.trim(),
+        boss_needed: it.querySelector(".s-boss-sel").value || "no"
+      })).filter(x => x.issue_type || x.comment);
+    }
+
+    document.getElementById("direction").addEventListener("change", onDirectionChange);
+    document.getElementById("planStatus").addEventListener("change", function() {
+      document.getElementById("planProblemsBlock").classList.toggle("hidden", this.value === "yes" || this.value === "");
+    });
+    document.getElementById("extraPeopleFlag").addEventListener("change", function() {
+      document.getElementById("peopleBlock").classList.toggle("hidden", this.value !== "yes");
+    });
+    document.getElementById("equipmentFlag").addEventListener("change", function() {
+      document.getElementById("equipmentBlock").classList.toggle("hidden", this.value !== "yes");
+    });
+    document.getElementById("hadOnObject").addEventListener("change", function() {
+      document.getElementById("hadOnObjectBlock").classList.toggle("hidden", this.value !== "yes");
+    });
+    document.getElementById("arrivedToday").addEventListener("change", function() {
+      document.getElementById("arrivedTodayBlock").classList.toggle("hidden", this.value !== "yes");
+    });
+    document.getElementById("usedToday").addEventListener("change", function() {
+      document.getElementById("usedTodayBlock").classList.toggle("hidden", this.value !== "yes");
+    });
+    document.getElementById("needTomorrowFlag").addEventListener("change", function() {
+      document.getElementById("needTomorrowBlock").classList.toggle("hidden", this.value !== "yes");
+    });
+    document.getElementById("assetIssuesFlag").addEventListener("change", function() {
+      document.getElementById("assetIssuesBlock").classList.toggle("hidden", this.value !== "yes");
+    });
+    document.getElementById("siteIssuesFlag").addEventListener("change", function() {
+      document.getElementById("siteIssuesBlock").classList.toggle("hidden", this.value !== "yes");
+    });
+
+    document.getElementById("reportForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const works = getWorks();
+      if (works.length === 0) {
+        tg.showAlert("Добавь хотя бы одну выполненную работу.");
+        return;
+      }
+
+      const payload = {
+        report_type: "evening_report_v3",
+        form_version: 3,
+        direction: document.getElementById("direction").value,
+        brigade: document.getElementById("brigade").value,
+        object_type: document.getElementById("objectType").value,
+        object_name: document.getElementById("objectName").value.trim(),
+        object_address: document.getElementById("objectAddress").value.trim(),
+        report_date: document.getElementById("reportDate").value,
+        workers_count: Number(document.getElementById("workersCount").value || 0),
+        shift_type: document.getElementById("shiftType").value,
+        plan_status: document.getElementById("planStatus").value,
+        planned_today: document.getElementById("plannedToday").value.trim(),
+        completed_today: document.getElementById("completedToday").value.trim(),
+        unfinished_work: document.getElementById("unfinishedWork").value.trim(),
+        plan_issue_reason: document.getElementById("planIssueReason").value,
+        tomorrow_plan: document.getElementById("tomorrowPlan").value.trim(),
+        tomorrow_needs: document.getElementById("tomorrowNeeds").value.trim(),
+        tomorrow_risks_text: document.getElementById("tomorrowRisksText").value.trim(),
+        need_boss_reaction: document.getElementById("needBossReaction").value,
+        direction_meta: getDirectionMeta(),
+        works: works,
+        people_resources: getPeopleResources(),
+        equipment_used: getEquipmentUsed(),
+        materials: getMaterials(),
+        asset_issues: getAssetIssues(),
+        site_issues: getSiteIssues(),
+        tg_user: tg.initDataUnsafe?.user || null
+      };
+
+      if (!payload.direction || !payload.brigade || !payload.object_type || !payload.object_name || !payload.report_date || !payload.workers_count) {
+        tg.showAlert("Заполни направление, бригаду, тип объекта, объект, дату и количество людей.");
+        return;
+      }
+      if (!payload.planned_today || !payload.completed_today || !payload.tomorrow_plan) {
+        tg.showAlert("Заполни план-факт и план на завтра.");
+        return;
+      }
+
+      tg.sendData(JSON.stringify(payload));
+      tg.close();
+    });
+
+    setToday();
+    addWork();
+  </script>
+</body>
+</html>
