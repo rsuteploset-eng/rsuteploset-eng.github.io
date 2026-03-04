@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Возврат инструмента (РСУ)</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --brand: #355d2f;
+            --brand-dark: #213d1d;
+            --border: #d7dfd4;
+            --text: #1e2a1c;
+            --bg: #f4f6f3;
+        }
+        * { box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 14px; }
+        .card { background: #fff; border-radius: 12px; padding: 14px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,.08); }
+        .header { text-align: center; margin-bottom: 16px; }
+        .header h2 { margin: 0; font-size: 20px; color: var(--brand-dark); }
+        .header p { margin: 4px 0 0; font-size: 13px; color: #657064; }
+        label { display: block; font-weight: bold; font-size: 14px; margin-bottom: 6px; margin-top: 10px; }
+        select, input[type="text"], input[type="number"] {
+            width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 15px; margin-bottom: 8px;
+        }
+        .item-card { border: 1px solid #e4e6eb; border-radius: 8px; padding: 12px; margin-bottom: 12px; background: #fafbfc; }
+        .item-header { display: flex; align-items: center; font-weight: bold; font-size: 15px; cursor: pointer; }
+        .item-header input[type="checkbox"] { width: 20px; height: 20px; margin-right: 12px; }
+        .item-body { margin-top: 12px; padding-top: 12px; border-top: 1px solid #e4e6eb; display: none; }
+        .toggle-photo { display: flex; align-items: center; font-weight: normal; font-size: 15px; }
+        .toggle-photo input { width: 20px; height: 20px; margin-right: 10px; }
+    </style>
+</head>
+<body>
+    <div class="card header">
+        <h2>Оформление возврата</h2>
+        <p>Учет имущества РСУ</p>
+    </div>
+
+    <div class="card">
+        <label>Выберите активную выдачу:</label>
+        <select id="issue_id">
+            <option value="">-- Выберите из списка --</option>
+            <option value="ISS-TEST-001">ISS-TEST-001 | Котельная №17 (Перфоратор, Удлинитель)</option>
+            <option value="ISS-TEST-002">ISS-TEST-002 | Теплотрасса (Леса рамные)</option>
+        </select>
+    </div>
+
+    <div class="card" id="itemsBlock" style="display: none;">
+        <label>Что фактически возвращается?</label>
+        
+        <div class="item-card">
+            <label class="item-header">
+                <input type="checkbox" class="item-cb" data-code="TOOL-01" data-name="Перфоратор Makita 2470">
+                Перфоратор Makita (выдано: 1)
+            </label>
+            <div class="item-body">
+                <label>Количество:</label>
+                <input type="number" class="qty" value="1" min="1" max="1">
+                <label>Состояние:</label>
+                <select class="condition">
+                    <option value="исправно">✅ Исправно</option>
+                    <option value="с замечанием">⚠️ С замечанием</option>
+                    <option value="в ремонт">🛠 В ремонт</option>
+                    <option value="утеряно">❌ Утеряно/Некомплект</option>
+                </select>
+                <input type="text" class="comment" placeholder="Комментарий (поломка, дефект...)">
+            </div>
+        </div>
+
+        <div class="item-card">
+            <label class="item-header">
+                <input type="checkbox" class="item-cb" data-code="INV-05" data-name="Удлинитель 50м">
+                Удлинитель 50м (выдано: 2)
+            </label>
+            <div class="item-body">
+                <label>Количество:</label>
+                <input type="number" class="qty" value="2" min="1" max="2">
+                <label>Состояние:</label>
+                <select class="condition">
+                    <option value="исправно">✅ Исправно</option>
+                    <option value="с замечанием">⚠️ С замечанием</option>
+                    <option value="в ремонт">🛠 В ремонт</option>
+                </select>
+                <input type="text" class="comment" placeholder="Комментарий...">
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <label>Куда передано имущество:</label>
+        <select id="return_to">
+            <option value="База РСУ">На базу РСУ</option>
+            <option value="Оставлено на объекте">Оставлено на объекте</option>
+            <option value="Сдано на склад">Сдано на Центральный склад</option>
+        </select>
+    </div>
+
+    <div class="card">
+        <label class="toggle-photo">
+            <input type="checkbox" id="need_photo" checked>
+            Прикрепить фото (бот запросит в чате)
+        </label>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+
+        // Показываем блок с инструментом только если выбрана выдача
+        document.getElementById('issue_id').addEventListener('change', function() {
+            document.getElementById('itemsBlock').style.display = this.value ? 'block' : 'none';
+        });
+
+        // Разворачиваем детали при выборе чекбокса
+        document.querySelectorAll('.item-cb').forEach(cb => {
+            cb.addEventListener('change', function() {
+                this.closest('.item-card').querySelector('.item-body').style.display = this.checked ? 'block' : 'none';
+            });
+        });
+
+        tg.MainButton.setText("ОФОРМИТЬ ВОЗВРАТ");
+        tg.MainButton.color = "#355d2f";
+        tg.MainButton.show();
+
+        tg.MainButton.onClick(function() {
+            const issueId = document.getElementById('issue_id').value;
+            if (!issueId) return tg.showAlert("Выберите выдачу!");
+
+            const items = [];
+            document.querySelectorAll('.item-cb:checked').forEach(cb => {
+                const body = cb.closest('.item-card').querySelector('.item-body');
+                items.push({
+                    item_code: cb.dataset.code,
+                    name: cb.dataset.name,
+                    qty: parseInt(body.querySelector('.qty').value),
+                    condition: body.querySelector('.condition').value,
+                    comment: body.querySelector('.comment').value
+                });
+            });
+
+            if (items.length === 0) return tg.showAlert("Отметьте галочками позиции, которые возвращаете!");
+
+            const payload = {
+                type: "asset_return_v1",
+                issue_id: issueId,
+                return_to: document.getElementById('return_to').value,
+                need_photo: document.getElementById('need_photo').checked,
+                items: items
+            };
+
+            tg.sendData(JSON.stringify(payload));
+        });
+    </script>
+</body>
+</html>
