@@ -126,7 +126,6 @@
             <select id="recipientSelect" required>
                 <option value="">Загрузка...</option>
             </select>
-            <!-- скрытое поле для Telegram ID получателя -->
             <input type="hidden" id="recipientId">
 
             <label>Подразделение получателя</label>
@@ -174,7 +173,6 @@
 
         let users = [];
 
-        // Запрашиваем список пользователей при загрузке
         tg.sendData(JSON.stringify({ type: "get_users_list" }));
 
         tg.onEvent('message', (event) => {
@@ -183,8 +181,6 @@
                 if (data.type === "users_list") {
                     users = data.users;
                     populateUsers();
-                } else if (data.type === "my_tools_list") {
-                    // пока не используется
                 }
             } catch (e) {
                 console.error('Ошибка парсинга ответа:', e);
@@ -199,20 +195,16 @@
             users.forEach(u => {
                 const option = document.createElement('option');
                 option.value = u.id;      // Telegram ID
-                option.textContent = u.name;
+                option.textContent = u.name; // полное ФИО
                 select.appendChild(option);
             });
         }
 
-        // Обновление скрытого поля при выборе получателя
         document.getElementById('recipientSelect').addEventListener('change', function() {
             const selectedId = this.value;
             const selectedUser = users.find(u => u.id === selectedId);
             document.getElementById('recipientId').value = selectedId;
-            // Можно также заполнить поле "Получатель" (если нужно текстовое)
-            // Для совместимости оставим поле "recipientName" скрытым, но будем его заполнять
-            // или изменим логику в бэкенде, чтобы он брал имя из базы по ID
-            // Сейчас в форме нет поля recipientName, но оно может быть нужно. Добавим скрытое.
+            // создаём скрытое поле для имени, если его нет
             if (!document.getElementById('recipientName')) {
                 const input = document.createElement('input');
                 input.type = 'hidden';
@@ -223,7 +215,6 @@
             document.getElementById('recipientName').value = selectedUser ? selectedUser.name : '';
         });
 
-        // Остальной код формы выдачи (addIssueItem, сбор данных, отправка)
         const CATEGORIES = ["Электроинструмент","Ручной инструмент","Леса","Лестницы / вышки","Удлинители","Насосы","Сварочное","Прочее"];
         const ACCOUNTING_TYPES = [
             { value: "instance", label: "Поэкземплярный" },
