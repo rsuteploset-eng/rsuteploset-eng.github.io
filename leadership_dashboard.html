@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RSU-ERP v3 · Панель руководства</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --primary: #2f5f4f;
+      --secondary: #1f3d33;
+      --accent: #d7b56d;
+      --bg: #f5f7f6;
+      --card: #ffffff;
+      --text: #1b1f1d;
+      --muted: #6b756f;
+      --border: #d8dfdb;
+      --shadow: 0 10px 30px rgba(31, 61, 51, 0.08);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+    }
+    .page {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+    .hero {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      background: linear-gradient(135deg, var(--secondary), var(--primary));
+      color: #fff;
+      padding: 18px;
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+    .hero img {
+      width: 70px;
+      height: 70px;
+      object-fit: contain;
+      background: rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 6px;
+    }
+    .hero-title {
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .hero-subtitle {
+      font-size: 13px;
+      opacity: 0.9;
+      margin-top: 4px;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+    .metric-label {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+    .metric-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--secondary);
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin: 0 0 12px 0;
+    }
+    .list {
+      display: grid;
+      gap: 10px;
+    }
+    .list-item {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px;
+      background: #fff;
+    }
+    .muted {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 10px 0 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="hero">
+      <img src="./logo.png" alt="Логотип">
+      <div>
+        <div class="hero-title">RSU-ERP v3 · Панель руководства</div>
+        <div class="hero-subtitle">
+          Директор · Заместитель директора по строительству · Начальник РМУ · Начальник РСУ
+        </div>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card">
+        <div class="metric-label">Активные объекты</div>
+        <div class="metric-value">12</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">Людей в работе</div>
+        <div class="metric-value">47</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">Инструмент на объектах</div>
+        <div class="metric-value">186</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">Проблемные объекты</div>
+        <div class="metric-value">3</div>
+      </div>
+      <div class="card">
+        <div class="metric-label">Просроченные заявки</div>
+        <div class="metric-value">9</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Зоны внимания руководства</div>
+      <div class="list">
+        <div class="list-item">
+          <b>Теплотрасса Бровки</b><br>
+          <span class="muted">Объект в работе 18 дней · мало движений · требуется контроль сроков</span>
+        </div>
+        <div class="list-item">
+          <b>Котельная №3</b><br>
+          <span class="muted">На объекте числится повышенное количество инструмента · нужна сверка</span>
+        </div>
+        <div class="list-item">
+          <b>РСУ Заславль</b><br>
+          <span class="muted">Высокая загрузка бригады · требуется перераспределение ресурсов</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-title">Что будет дальше</div>
+      <div class="muted">
+        Следующий этап — подключение реальных данных из Google Sheets:
+        объекты, люди, инструменты, материалы, графики, PDF-отчёты и глубокая аналитика.
+      </div>
+    </div>
+
+    <div class="footer">
+      RSU-ERP v3 · Руководительская цифровая панель Минрайтеплосети
+    </div>
+  </div>
+
+  <script>
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
+  </script>
+</body>
+</html>
