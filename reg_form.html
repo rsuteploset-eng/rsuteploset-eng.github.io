@@ -1,136 +1,393 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Регистрация в системе РСУ</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        :root {
-            --brand: #355d2f;
-            --brand-dark: #213d1d;
-            --border: #d7dfd4;
-            --text: #1e2a1c;
-            --bg: #f4f6f3;
-            --white: #ffffff;
-        }
-        * { box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            margin: 0;
-            padding: 16px;
-            line-height: 1.5;
-        }
-        .card {
-            background: var(--white);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            border: 1px solid var(--border);
-        }
-        .header { text-align: center; margin-bottom: 24px; }
-        .header h2 { margin: 0; color: var(--brand-dark); font-size: 22px; }
-        .header p { margin: 8px 0 0; font-size: 14px; color: #657064; }
-        
-        label {
-            display: block;
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 8px;
-            color: var(--brand-dark);
-        }
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 16px;
-            margin-bottom: 16px;
-            background: #fafafa;
-            transition: border-color 0.2s;
-        }
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--brand);
-            background: var(--white);
-        }
-        .info-box {
-            font-size: 13px;
-            background: #edf4eb;
-            padding: 12px;
-            border-radius: 8px;
-            color: var(--brand-dark);
-            border-left: 4px solid var(--brand);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RSU-ERP v3 · Регистрация</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="./config.js"></script>
+  <style>
+    :root {
+      --rsu-primary: #2f5f4f;
+      --rsu-secondary: #1f3d33;
+      --rsu-accent: #d7b56d;
+      --rsu-danger: #b33a3a;
+      --rsu-bg: #f5f7f6;
+      --rsu-card: #ffffff;
+      --rsu-text: #1b1f1d;
+      --rsu-muted: #6b756f;
+      --rsu-border: #d8dfdb;
+      --rsu-radius: 18px;
+      --rsu-shadow: 0 10px 30px rgba(31, 61, 51, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--rsu-bg);
+      color: var(--rsu-text);
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+    }
+
+    .page {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .hero {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: linear-gradient(135deg, var(--rsu-secondary), var(--rsu-primary));
+      color: #fff;
+      border-radius: 22px;
+      padding: 18px;
+      box-shadow: var(--rsu-shadow);
+      margin-bottom: 18px;
+    }
+
+    .hero-logo {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.12);
+      padding: 7px;
+      flex-shrink: 0;
+    }
+
+    .hero-title {
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+
+    .hero-subtitle {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    .card {
+      background: var(--rsu-card);
+      border: 1px solid var(--rsu-border);
+      border-radius: var(--rsu-radius);
+      padding: 18px;
+      box-shadow: var(--rsu-shadow);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      margin: 0 0 12px 0;
+      font-size: 19px;
+      font-weight: 700;
+    }
+
+    .lead {
+      margin: 0;
+      color: var(--rsu-muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .highlight {
+      margin-top: 14px;
+      padding: 14px;
+      background: #f0f5f2;
+      border: 1px solid var(--rsu-border);
+      border-radius: 14px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .quote {
+      margin-top: 12px;
+      font-weight: 700;
+      color: var(--rsu-secondary);
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .label {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .input,
+    .select,
+    .textarea {
+      width: 100%;
+      border: 1px solid var(--rsu-border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 15px;
+      background: #fff;
+      color: var(--rsu-text);
+      outline: none;
+    }
+
+    .input:focus,
+    .select:focus,
+    .textarea:focus {
+      border-color: var(--rsu-primary);
+      box-shadow: 0 0 0 3px rgba(47,95,79,0.12);
+    }
+
+    .textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--rsu-muted);
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .btn {
+      appearance: none;
+      border: none;
+      border-radius: 12px;
+      padding: 13px 18px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 700;
+      transition: 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--rsu-primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #244a3d;
+    }
+
+    .btn-secondary {
+      background: #edf2ef;
+      color: var(--rsu-text);
+    }
+
+    .status {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      display: none;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .status.ok {
+      display: block;
+      background: #edf7f1;
+      border: 1px solid #c7e4d0;
+      color: #1f5a33;
+    }
+
+    .status.error {
+      display: block;
+      background: #fff1f1;
+      border: 1px solid #f1c5c5;
+      color: #8d2626;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: var(--rsu-muted);
+      padding: 8px 0 20px 0;
+    }
+
+    @media (max-width: 640px) {
+      .hero {
+        align-items: flex-start;
+      }
+
+      .hero-logo {
+        width: 62px;
+        height: 62px;
+      }
+
+      .hero-title {
+        font-size: 21px;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="header">
-        <h2>Регистрация сотрудника</h2>
-        <p>Минрайтеплосеть • РСУ</p>
+  <div class="page">
+    <div class="hero">
+      <img id="logo" class="hero-logo" alt="Эмблема предприятия">
+      <div>
+        <div class="hero-title">Минрайтеплосеть · RSU-ERP v3</div>
+        <div class="hero-subtitle">Внутренняя цифровая система ремонтно-строительного участка</div>
+      </div>
     </div>
 
     <div class="card">
-        <label for="fio">Фамилия Имя Отчество</label>
-        <input type="text" id="fio" placeholder="Иванов Иван Иванович" required>
+      <div class="section-title">Добро пожаловать</div>
+      <p class="lead">
+        Перед вами корпоративная система учёта и внутренних процессов РСУ.
+        Здесь оформляется доступ сотрудников к рабочей цифровой среде предприятия.
+      </p>
 
-        <label for="role">Ваша должность / роль</label>
-        <select id="role">
-            <option value="Бригадир">Бригадир</option>
-            <option value="Мастер">Мастер</option>
-            <option value="Начальник участка">Начальник участка</option>
-            <option value="Снабженец">Снабженец</option>
-            <option value="Механик">Механик</option>
-        </select>
-
-        <label for="brigade">Название бригады или Объекта</label>
-        <input type="text" id="brigade" placeholder="Бригада №1 / Котельная №17" required>
-        
-        <div class="info-box">
-            После отправки анкеты ваш доступ должен подтвердить Мастер. Вы получите уведомление в боте.
+      <div class="highlight">
+        Проект создан <b>бригадой РСУ Заславль</b><br>
+        под чутким руководством <b>Начальника РСУ</b><br>
+        в русле общего курса предприятия на порядок, прозрачность и современные подходы к организации работы.
+        <div class="quote">
+          Сильное предприятие видно не только по объектам, но и по тому, как у него устроены внутренние процессы.
         </div>
+      </div>
     </div>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.ready();
+    <div class="card">
+      <div class="section-title">Заявка на доступ</div>
 
-        // Настройка главной кнопки Telegram
-        tg.MainButton.setText("ОТПРАВИТЬ ЗАЯВКУ");
-        tg.MainButton.setParams({
-            color: "#355d2f",
-            text_color: "#ffffff"
-        });
-        tg.MainButton.show();
+      <form id="regForm" class="form-grid">
+        <div class="field">
+          <label class="label" for="fullName">ФИО</label>
+          <input class="input" id="fullName" name="fullName" type="text" placeholder="Например: Иванов Иван Иванович" required>
+        </div>
 
-        tg.MainButton.onClick(function() {
-            const fio = document.getElementById('fio').value.trim();
-            const role = document.getElementById('role').value;
-            const brigade = document.getElementById('brigade').value.trim();
+        <div class="field">
+          <label class="label" for="position">Кто вы</label>
+          <select class="select" id="position" name="position" required>
+            <option value="">Выберите вариант</option>
+            <option value="Работник">Работник</option>
+            <option value="Бригадир">Бригадир</option>
+            <option value="Мастер">Мастер</option>
+            <option value="Водитель">Водитель</option>
+            <option value="Кладовщик">Кладовщик</option>
+            <option value="Начальник котельной">Начальник котельной</option>
+            <option value="Аварийная служба">Аварийная служба</option>
+            <option value="Другое">Другое</option>
+          </select>
+        </div>
 
-            if (fio.length < 5) {
-                return tg.showAlert("Введите полное ФИО");
-            }
-            if (brigade.length < 2) {
-                return tg.showAlert("Укажите название бригады или объекта");
-            }
+        <div class="field">
+          <label class="label" for="phone">Телефон</label>
+          <input class="input" id="phone" name="phone" type="tel" placeholder="+37529XXXXXXX">
+          <div class="hint">Можно оставить пустым, если номер пока не хотите указывать.</div>
+        </div>
 
-            const payload = {
-                type: "user_registration_v1",
-                fio: fio,
-                role: role,
-                brigade: brigade,
-                timestamp: new Date().toISOString()
-            };
+        <div class="field">
+          <label class="label" for="unit">Подразделение / бригада / место работы</label>
+          <input class="input" id="unit" name="unit" type="text" placeholder="Например: РСУ Заславль / Отделочники / Теплотрасса">
+        </div>
 
-            // Отправляем данные боту
-            tg.sendData(JSON.stringify(payload));
-            tg.close();
-        });
-    </script>
+        <div class="field">
+          <label class="label" for="comment">Комментарий</label>
+          <textarea class="textarea" id="comment" name="comment" placeholder="При необходимости можно указать дополнительную информацию"></textarea>
+        </div>
+
+        <div class="actions">
+          <button class="btn btn-primary" type="submit">📝 Подать заявку</button>
+          <button class="btn btn-secondary" type="button" id="closeBtn">Закрыть</button>
+        </div>
+
+        <div id="statusBox" class="status"></div>
+      </form>
+    </div>
+
+    <div class="footer">
+      RSU-ERP v3 · Внутренняя цифровая среда Минрайтеплосети
+    </div>
+  </div>
+
+  <script>
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
+
+    if (window.RSU_CONFIG?.LOGO_DATA_URI) {
+      document.getElementById("logo").src = window.RSU_CONFIG.LOGO_DATA_URI;
+    }
+
+    const form = document.getElementById("regForm");
+    const statusBox = document.getElementById("statusBox");
+    const closeBtn = document.getElementById("closeBtn");
+
+    function showStatus(message, type = "ok") {
+      statusBox.className = "status " + type;
+      statusBox.textContent = message;
+    }
+
+    function normalizeSpaces(value) {
+      return (value || "").replace(/\s+/g, " ").trim();
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const fullName = normalizeSpaces(document.getElementById("fullName").value);
+      const position = normalizeSpaces(document.getElementById("position").value);
+      const phone = normalizeSpaces(document.getElementById("phone").value);
+      const unit = normalizeSpaces(document.getElementById("unit").value);
+      const comment = normalizeSpaces(document.getElementById("comment").value);
+
+      if (!fullName) {
+        showStatus("Укажите ФИО.", "error");
+        return;
+      }
+
+      if (!position) {
+        showStatus("Выберите, кто вы.", "error");
+        return;
+      }
+
+      const payload = {
+        action: "register",
+        full_name: fullName,
+        position: position,
+        phone: phone,
+        unit: unit,
+        comment: comment,
+        telegram_user: tg?.initDataUnsafe?.user || null
+      };
+
+      try {
+        if (tg) {
+          tg.sendData(JSON.stringify(payload));
+          showStatus("Заявка отправлена. Ожидайте подтверждения администратора.", "ok");
+          setTimeout(() => tg.close(), 1200);
+        } else {
+          showStatus("Telegram WebApp недоступен. Откройте форму из Telegram.", "error");
+        }
+      } catch (err) {
+        showStatus("Не удалось отправить заявку. Попробуйте ещё раз.", "error");
+      }
+    });
+
+    closeBtn.addEventListener("click", () => {
+      if (tg) tg.close();
+    });
+  </script>
 </body>
 </html>
