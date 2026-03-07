@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RSU-ERP v3 · Выдача инструмента</title>
+  <title>RSU-ERP v3 · Выдача инструмента v2</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     :root {
@@ -32,7 +32,7 @@
     }
 
     .page {
-      max-width: 920px;
+      max-width: 960px;
       margin: 0 auto;
       padding: 16px;
     }
@@ -156,6 +156,16 @@
       line-height: 1.4;
     }
 
+    .muted-box {
+      padding: 12px 14px;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      background: #f8faf9;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
     .summary {
       display: grid;
       gap: 10px;
@@ -243,6 +253,10 @@
       color: var(--danger);
     }
 
+    .hidden {
+      display: none !important;
+    }
+
     .footer {
       text-align: center;
       font-size: 12px;
@@ -284,61 +298,82 @@
     <div class="hero">
       <img src="./logo.png" alt="Логотип">
       <div>
-        <div class="hero-title">RSU-ERP v3 · Выдача инструмента</div>
+        <div class="hero-title">RSU-ERP v3 · Выдача инструмента v2</div>
         <div class="hero-subtitle">
-          Оформление ответственной выдачи инструмента, инвентаря и оборудования
+          Умная выдача под сотрудника, объект, АДС, бригаду, участок или котельную
         </div>
       </div>
     </div>
 
     <div class="card">
-      <div class="section-title">Что делает эта форма</div>
+      <div class="section-title">Что изменилось</div>
       <p class="lead">
-        Здесь оформляется подтверждённая выдача инструмента ответственным лицом.
-        Форма фиксирует получателя, объект, причину выдачи, состояние инструмента
-        и плановую дату возврата.
+        Форма больше не заставляет помнить ID и инвентарные номера.
+        Сначала выбирается сценарий выдачи, потом получатель, место использования
+        и инструмент. Если объекта нет, система сможет передать backend запрос на создание.
       </p>
     </div>
 
     <form id="issueForm">
       <div class="card">
         <div class="step-badge">Шаг 1</div>
-        <div class="section-title">Кто оформляет выдачу</div>
+        <div class="section-title">Тип выдачи</div>
+
         <div class="grid">
           <div class="field">
-            <label class="label" for="issuerName">Ответственное лицо</label>
-            <input class="input" id="issuerName" name="issuerName" type="text" placeholder="Например: Начальник РСУ" />
-            <div class="hint">
-              Сейчас это поле заполняется вручную для MVP. Позже будет подтягиваться автоматически из Telegram-профиля и роли.
-            </div>
+            <label class="label" for="issueMode">Куда / кому выдаём</label>
+            <select class="select" id="issueMode" name="issueMode" required>
+              <option value="">Выберите сценарий</option>
+              <option value="employee">Сотруднику</option>
+              <option value="site">На объект</option>
+              <option value="team">Бригаде / подразделению</option>
+              <option value="ads">АДС / дежурной службе</option>
+              <option value="area">На участок / котельную</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="label" for="issuerName">Кто оформляет</label>
+            <input class="input" id="issuerName" name="issuerName" type="text" placeholder="Можно оставить пустым, backend возьмёт из Telegram" />
           </div>
         </div>
       </div>
 
       <div class="card">
         <div class="step-badge">Шаг 2</div>
-        <div class="section-title">Кому выдаётся инструмент</div>
+        <div class="section-title">Получатель и ответственность</div>
+
         <div class="grid">
-          <div class="field">
-            <label class="label" for="recipientType">Тип получателя</label>
-            <select class="select" id="recipientType" name="recipientType" required>
-              <option value="">Выберите тип</option>
-              <option value="Пользователь">Пользователь</option>
-              <option value="Бригада">Бригада</option>
-              <option value="Объект">Объект</option>
-              <option value="Аварийная группа">Аварийная группа</option>
-            </select>
+          <div id="employeeBlock" class="field hidden">
+            <label class="label" for="employeeName">Сотрудник</label>
+            <input class="input" id="employeeName" name="employeeName" type="text" placeholder="Например: Иванов Иван Иванович" />
           </div>
 
-          <div class="field-inline">
-            <div class="field">
-              <label class="label" for="recipientName">Получатель</label>
-              <input class="input" id="recipientName" name="recipientName" type="text" placeholder="Например: Иванов Иван Александрович / Бригада Заславль" required />
-            </div>
+          <div id="teamBlock" class="field hidden">
+            <label class="label" for="teamName">Бригада / подразделение</label>
+            <input class="input" id="teamName" name="teamName" type="text" placeholder="Например: Бригада Заславль / РСУ Заславль" />
+          </div>
 
-            <div class="field">
-              <label class="label" for="recipientRole">Роль / уточнение</label>
-              <input class="input" id="recipientRole" name="recipientRole" type="text" placeholder="Например: Работник / Водитель / Бригадир" />
+          <div id="adsBlock" class="field hidden">
+            <label class="label" for="adsName">Служба / дежурная группа</label>
+            <input class="input" id="adsName" name="adsName" type="text" placeholder="Например: АДС / Дежурная смена №1" />
+          </div>
+
+          <div id="areaBlock" class="field hidden">
+            <label class="label" for="areaName">Участок / котельная</label>
+            <input class="input" id="areaName" name="areaName" type="text" placeholder="Например: Котельная №3 / Участок Боровляны" />
+          </div>
+
+          <div id="siteReceiverBlock" class="field hidden">
+            <label class="label" for="siteResponsibleName">Ответственный на объекте</label>
+            <input class="input" id="siteResponsibleName" name="siteResponsibleName" type="text" placeholder="Например: Петров Пётр Петрович" />
+          </div>
+
+          <div class="field">
+            <label class="label" for="responsibleName">Персонально ответственный</label>
+            <input class="input" id="responsibleName" name="responsibleName" type="text" placeholder="Если отличается от получателя — укажи здесь" />
+            <div class="hint">
+              Для АДС, бригады, участка и объекта можно отдельно указать конкретного ответственного человека.
             </div>
           </div>
         </div>
@@ -346,33 +381,85 @@
 
       <div class="card">
         <div class="step-badge">Шаг 3</div>
-        <div class="section-title">Объект и инструмент</div>
+        <div class="section-title">Объект / место использования</div>
+
         <div class="grid">
           <div class="field">
+            <label class="label" for="usageLocationMode">Где будет использоваться</label>
+            <select class="select" id="usageLocationMode" name="usageLocationMode">
+              <option value="site">На объекте</option>
+              <option value="area">На участке / котельной</option>
+              <option value="duty">Дежурное использование</option>
+              <option value="free">Без привязки к объекту</option>
+            </select>
+          </div>
+
+          <div id="siteSearchBlock" class="field">
             <label class="label" for="siteName">Объект</label>
-            <input class="input" id="siteName" name="siteName" type="text" placeholder="Например: Теплотрасса Бровки" required />
+            <input class="input" id="siteName" name="siteName" type="text" placeholder="Например: Теплотрасса Бровки" />
             <div class="hint">
-              На следующем этапе здесь будет умный выбор из существующих объектов и защита от дублей.
+              Если объекта нет, backend сможет создать новый объект с антидублем.
             </div>
           </div>
 
-          <div class="field-inline">
-            <div class="field">
-              <label class="label" for="toolName">Инструмент / инвентарь</label>
-              <input class="input" id="toolName" name="toolName" type="text" placeholder="Например: Перфоратор Bosch" required />
-            </div>
+          <div id="siteCreateBlock" class="field">
+            <label class="label" for="siteCreationMode">Если объект не найден</label>
+            <select class="select" id="siteCreationMode" name="siteCreationMode">
+              <option value="suggest_create">Предложить создать новый</option>
+              <option value="force_create">Создать новый объект</option>
+              <option value="must_exist">Объект должен существовать</option>
+            </select>
+          </div>
 
-            <div class="field">
-              <label class="label" for="inventoryNo">Инвентарный номер</label>
-              <input class="input" id="inventoryNo" name="inventoryNo" type="text" placeholder="Например: INV-00125" required />
-            </div>
+          <div id="locationHintBlock" class="muted-box">
+            Для выдачи без привязки к объекту или под дежурство поле объекта можно оставить пустым.
           </div>
         </div>
       </div>
 
       <div class="card">
         <div class="step-badge">Шаг 4</div>
+        <div class="section-title">Поиск инструмента</div>
+
+        <div class="grid">
+          <div class="field">
+            <label class="label" for="toolSearchText">Что ищем</label>
+            <input class="input" id="toolSearchText" name="toolSearchText" type="text" placeholder="Например: перфоратор, болгарка, лопата, насос" required />
+          </div>
+
+          <div class="field-inline">
+            <div class="field">
+              <label class="label" for="toolCategory">Категория</label>
+              <select class="select" id="toolCategory" name="toolCategory">
+                <option value="">Любая</option>
+                <option value="Электроинструмент">Электроинструмент</option>
+                <option value="Ручной инструмент">Ручной инструмент</option>
+                <option value="Измерительный">Измерительный</option>
+                <option value="Инвентарь">Инвентарь</option>
+                <option value="Оснастка">Оснастка</option>
+                <option value="Прочее">Прочее</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="label" for="inventoryNo">Часть инвентарного номера</label>
+              <input class="input" id="inventoryNo" name="inventoryNo" type="text" placeholder="Необязательно. Например: 125 или INV-00125" />
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label" for="toolSelectionHint">Подсказка</label>
+            <div class="muted-box" id="toolSelectionHint">
+              Пока backend ещё не отдает живой список найденных позиций, поэтому на этом этапе можно ввести название инструмента и, если знаешь, часть инвентарного номера.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="step-badge">Шаг 5</div>
         <div class="section-title">Условия выдачи</div>
+
         <div class="grid">
           <div class="field-inline">
             <div class="field">
@@ -381,9 +468,10 @@
                 <option value="">Выберите причину</option>
                 <option value="Работа на объекте">Работа на объекте</option>
                 <option value="Аварийный выезд">Аварийный выезд</option>
-                <option value="Временное использование">Временное использование</option>
+                <option value="Дежурное использование">Дежурное использование</option>
                 <option value="Для бригады">Для бригады</option>
-                <option value="Перевозка / сопровождение">Перевозка / сопровождение</option>
+                <option value="Для участка / котельной">Для участка / котельной</option>
+                <option value="Временное использование">Временное использование</option>
                 <option value="Проверка / диагностика">Проверка / диагностика</option>
               </select>
             </div>
@@ -418,30 +506,31 @@
 
           <div class="field">
             <label class="label" for="comment">Комментарий</label>
-            <textarea class="textarea" id="comment" name="comment" placeholder="Например: выдан под аварийный выезд, вернуть после завершения работ"></textarea>
+            <textarea class="textarea" id="comment" name="comment" placeholder="Например: выдан на дежурство, под аварийный выезд, закреплён за котельной №3"></textarea>
           </div>
         </div>
       </div>
 
       <div class="card">
-        <div class="step-badge">Шаг 5</div>
+        <div class="step-badge">Шаг 6</div>
         <div class="section-title">Подтверждение</div>
-        <div class="summary" id="summaryBox">
+
+        <div class="summary">
           <div class="summary-row">
-            <div class="summary-key">Ответственное лицо</div>
-            <div class="summary-value" id="sumIssuer">—</div>
-          </div>
-          <div class="summary-row">
-            <div class="summary-key">Тип получателя</div>
-            <div class="summary-value" id="sumRecipientType">—</div>
+            <div class="summary-key">Тип выдачи</div>
+            <div class="summary-value" id="sumIssueMode">—</div>
           </div>
           <div class="summary-row">
             <div class="summary-key">Получатель</div>
             <div class="summary-value" id="sumRecipient">—</div>
           </div>
           <div class="summary-row">
-            <div class="summary-key">Объект</div>
-            <div class="summary-value" id="sumSite">—</div>
+            <div class="summary-key">Ответственный</div>
+            <div class="summary-value" id="sumResponsible">—</div>
+          </div>
+          <div class="summary-row">
+            <div class="summary-key">Место использования</div>
+            <div class="summary-value" id="sumLocation">—</div>
           </div>
           <div class="summary-row">
             <div class="summary-key">Инструмент</div>
@@ -452,11 +541,11 @@
             <div class="summary-value" id="sumReason">—</div>
           </div>
           <div class="summary-row">
-            <div class="summary-key">Плановый возврат</div>
+            <div class="summary-key">Возврат</div>
             <div class="summary-value" id="sumReturnDate">—</div>
           </div>
           <div class="summary-row">
-            <div class="summary-key">Состояние при выдаче</div>
+            <div class="summary-key">Состояние</div>
             <div class="summary-value" id="sumCondition">—</div>
           </div>
         </div>
@@ -471,7 +560,7 @@
     </form>
 
     <div class="footer">
-      RSU-ERP v3 · Контур выдачи инструмента MVP 1.0
+      RSU-ERP v3 · Выдача инструмента v2
     </div>
   </div>
 
@@ -486,26 +575,46 @@
     const statusBox = document.getElementById("statusBox");
     const closeBtn = document.getElementById("closeBtn");
 
-    const fields = {
+    const els = {
+      issueMode: document.getElementById("issueMode"),
       issuerName: document.getElementById("issuerName"),
-      recipientType: document.getElementById("recipientType"),
-      recipientName: document.getElementById("recipientName"),
-      recipientRole: document.getElementById("recipientRole"),
+
+      employeeName: document.getElementById("employeeName"),
+      teamName: document.getElementById("teamName"),
+      adsName: document.getElementById("adsName"),
+      areaName: document.getElementById("areaName"),
+      siteResponsibleName: document.getElementById("siteResponsibleName"),
+      responsibleName: document.getElementById("responsibleName"),
+
+      usageLocationMode: document.getElementById("usageLocationMode"),
       siteName: document.getElementById("siteName"),
-      toolName: document.getElementById("toolName"),
+      siteCreationMode: document.getElementById("siteCreationMode"),
+
+      toolSearchText: document.getElementById("toolSearchText"),
+      toolCategory: document.getElementById("toolCategory"),
       inventoryNo: document.getElementById("inventoryNo"),
+
       issueReason: document.getElementById("issueReason"),
       plannedReturnDate: document.getElementById("plannedReturnDate"),
       issueCondition: document.getElementById("issueCondition"),
       priority: document.getElementById("priority"),
       comment: document.getElementById("comment"),
+
+      employeeBlock: document.getElementById("employeeBlock"),
+      teamBlock: document.getElementById("teamBlock"),
+      adsBlock: document.getElementById("adsBlock"),
+      areaBlock: document.getElementById("areaBlock"),
+      siteReceiverBlock: document.getElementById("siteReceiverBlock"),
+      siteSearchBlock: document.getElementById("siteSearchBlock"),
+      siteCreateBlock: document.getElementById("siteCreateBlock"),
+      locationHintBlock: document.getElementById("locationHintBlock"),
     };
 
     const summary = {
-      issuer: document.getElementById("sumIssuer"),
-      recipientType: document.getElementById("sumRecipientType"),
+      issueMode: document.getElementById("sumIssueMode"),
       recipient: document.getElementById("sumRecipient"),
-      site: document.getElementById("sumSite"),
+      responsible: document.getElementById("sumResponsible"),
+      location: document.getElementById("sumLocation"),
       tool: document.getElementById("sumTool"),
       reason: document.getElementById("sumReason"),
       returnDate: document.getElementById("sumReturnDate"),
@@ -521,104 +630,197 @@
       statusBox.textContent = message;
     }
 
-    function refreshSummary() {
-      const toolText = [normalize(fields.toolName.value), normalize(fields.inventoryNo.value)]
-        .filter(Boolean)
-        .join(" · ");
-
-      const recipientText = [normalize(fields.recipientName.value), normalize(fields.recipientRole.value)]
-        .filter(Boolean)
-        .join(" · ");
-
-      summary.issuer.textContent = normalize(fields.issuerName.value) || "—";
-      summary.recipientType.textContent = normalize(fields.recipientType.value) || "—";
-      summary.recipient.textContent = recipientText || "—";
-      summary.site.textContent = normalize(fields.siteName.value) || "—";
-      summary.tool.textContent = toolText || "—";
-      summary.reason.textContent = normalize(fields.issueReason.value) || "—";
-      summary.returnDate.textContent = normalize(fields.plannedReturnDate.value) || "—";
-      summary.condition.textContent = normalize(fields.issueCondition.value) || "—";
+    function hideAllModeBlocks() {
+      els.employeeBlock.classList.add("hidden");
+      els.teamBlock.classList.add("hidden");
+      els.adsBlock.classList.add("hidden");
+      els.areaBlock.classList.add("hidden");
+      els.siteReceiverBlock.classList.add("hidden");
     }
 
-    Object.values(fields).forEach((field) => {
-      field.addEventListener("input", refreshSummary);
-      field.addEventListener("change", refreshSummary);
+    function updateModeBlocks() {
+      hideAllModeBlocks();
+
+      const mode = normalize(els.issueMode.value);
+
+      if (mode === "employee") {
+        els.employeeBlock.classList.remove("hidden");
+      } else if (mode === "team") {
+        els.teamBlock.classList.remove("hidden");
+      } else if (mode === "ads") {
+        els.adsBlock.classList.remove("hidden");
+      } else if (mode === "area") {
+        els.areaBlock.classList.remove("hidden");
+      } else if (mode === "site") {
+        els.siteReceiverBlock.classList.remove("hidden");
+      }
+    }
+
+    function updateLocationBlocks() {
+      const locationMode = normalize(els.usageLocationMode.value);
+
+      if (locationMode === "free" || locationMode === "duty") {
+        els.siteSearchBlock.classList.add("hidden");
+        els.siteCreateBlock.classList.add("hidden");
+        els.locationHintBlock.classList.remove("hidden");
+      } else {
+        els.siteSearchBlock.classList.remove("hidden");
+        els.siteCreateBlock.classList.remove("hidden");
+        els.locationHintBlock.classList.add("hidden");
+      }
+    }
+
+    function getRecipientText() {
+      const mode = normalize(els.issueMode.value);
+
+      if (mode === "employee") return normalize(els.employeeName.value);
+      if (mode === "team") return normalize(els.teamName.value);
+      if (mode === "ads") return normalize(els.adsName.value);
+      if (mode === "area") return normalize(els.areaName.value);
+      if (mode === "site") return "На объект";
+      return "";
+    }
+
+    function getIssueModeTitle() {
+      const mode = normalize(els.issueMode.value);
+
+      if (mode === "employee") return "Сотруднику";
+      if (mode === "site") return "На объект";
+      if (mode === "team") return "Бригаде / подразделению";
+      if (mode === "ads") return "АДС / дежурной службе";
+      if (mode === "area") return "На участок / котельную";
+      return "";
+    }
+
+    function getLocationText() {
+      const mode = normalize(els.usageLocationMode.value);
+      const siteName = normalize(els.siteName.value);
+
+      if (mode === "site") return siteName || "Объект не указан";
+      if (mode === "area") return "Участок / котельная";
+      if (mode === "duty") return "Дежурное использование";
+      if (mode === "free") return "Без привязки к объекту";
+      return "—";
+    }
+
+    function refreshSummary() {
+      const toolText = [
+        normalize(els.toolSearchText.value),
+        normalize(els.inventoryNo.value)
+      ].filter(Boolean).join(" · ");
+
+      const responsibleText =
+        normalize(els.responsibleName.value) ||
+        normalize(els.siteResponsibleName.value) ||
+        getRecipientText();
+
+      summary.issueMode.textContent = getIssueModeTitle() || "—";
+      summary.recipient.textContent = getRecipientText() || "—";
+      summary.responsible.textContent = responsibleText || "—";
+      summary.location.textContent = getLocationText() || "—";
+      summary.tool.textContent = toolText || "—";
+      summary.reason.textContent = normalize(els.issueReason.value) || "—";
+      summary.returnDate.textContent = normalize(els.plannedReturnDate.value) || "не указан";
+      summary.condition.textContent = normalize(els.issueCondition.value) || "—";
+    }
+
+    function validateForm(payload) {
+      if (!payload.issue_mode) {
+        return "Выберите тип выдачи.";
+      }
+
+      if (payload.issue_mode === "employee" && !payload.employee_name) {
+        return "Укажите сотрудника.";
+      }
+
+      if (payload.issue_mode === "team" && !payload.team_name) {
+        return "Укажите бригаду или подразделение.";
+      }
+
+      if (payload.issue_mode === "ads" && !payload.ads_name) {
+        return "Укажите АДС / дежурную службу.";
+      }
+
+      if (payload.issue_mode === "area" && !payload.area_name) {
+        return "Укажите участок или котельную.";
+      }
+
+      if (payload.issue_mode === "site" && !payload.site_name && payload.usage_location_mode === "site") {
+        return "Укажите объект.";
+      }
+
+      if (!payload.tool_search_text) {
+        return "Укажите, какой инструмент или инвентарь нужен.";
+      }
+
+      if (!payload.issue_reason) {
+        return "Укажите причину выдачи.";
+      }
+
+      if (!payload.issue_condition) {
+        return "Укажите состояние при выдаче.";
+      }
+
+      return "";
+    }
+
+    Object.values(els).forEach((el) => {
+      if (!el || !el.addEventListener) return;
+      el.addEventListener("input", refreshSummary);
+      el.addEventListener("change", () => {
+        updateModeBlocks();
+        updateLocationBlocks();
+        refreshSummary();
+      });
     });
 
+    updateModeBlocks();
+    updateLocationBlocks();
     refreshSummary();
 
     form.addEventListener("submit", (e) => {
       e.preventDefault();
 
-      const issuerName = normalize(fields.issuerName.value);
-      const recipientType = normalize(fields.recipientType.value);
-      const recipientName = normalize(fields.recipientName.value);
-      const recipientRole = normalize(fields.recipientRole.value);
-      const siteName = normalize(fields.siteName.value);
-      const toolName = normalize(fields.toolName.value);
-      const inventoryNo = normalize(fields.inventoryNo.value);
-      const issueReason = normalize(fields.issueReason.value);
-      const plannedReturnDate = normalize(fields.plannedReturnDate.value);
-      const issueCondition = normalize(fields.issueCondition.value);
-      const priority = normalize(fields.priority.value);
-      const comment = normalize(fields.comment.value);
-
-      if (!recipientType) {
-        showStatus("Выберите тип получателя.", "error");
-        return;
-      }
-
-      if (!recipientName) {
-        showStatus("Укажите получателя.", "error");
-        return;
-      }
-
-      if (!siteName) {
-        showStatus("Укажите объект.", "error");
-        return;
-      }
-
-      if (!toolName) {
-        showStatus("Укажите инструмент.", "error");
-        return;
-      }
-
-      if (!inventoryNo) {
-        showStatus("Укажите инвентарный номер.", "error");
-        return;
-      }
-
-      if (!issueReason) {
-        showStatus("Укажите причину выдачи.", "error");
-        return;
-      }
-
-      if (!issueCondition) {
-        showStatus("Укажите состояние при выдаче.", "error");
-        return;
-      }
-
       const payload = {
-        action: "tool_issue_request",
-        issuer_name: issuerName,
-        recipient_type: recipientType,
-        recipient_name: recipientName,
-        recipient_role: recipientRole,
-        site_name: siteName,
-        tool_name: toolName,
-        inventory_no: inventoryNo,
-        issue_reason: issueReason,
-        planned_return_date: plannedReturnDate,
-        issue_condition: issueCondition,
-        priority: priority,
-        comment: comment,
+        action: "tool_issue_request_v2",
+
+        issuer_name: normalize(els.issuerName.value),
+
+        issue_mode: normalize(els.issueMode.value),
+        employee_name: normalize(els.employeeName.value),
+        team_name: normalize(els.teamName.value),
+        ads_name: normalize(els.adsName.value),
+        area_name: normalize(els.areaName.value),
+        site_responsible_name: normalize(els.siteResponsibleName.value),
+        responsible_name: normalize(els.responsibleName.value),
+
+        usage_location_mode: normalize(els.usageLocationMode.value),
+        site_name: normalize(els.siteName.value),
+        site_creation_mode: normalize(els.siteCreationMode.value),
+
+        tool_search_text: normalize(els.toolSearchText.value),
+        tool_category: normalize(els.toolCategory.value),
+        inventory_no: normalize(els.inventoryNo.value),
+
+        issue_reason: normalize(els.issueReason.value),
+        planned_return_date: normalize(els.plannedReturnDate.value),
+        issue_condition: normalize(els.issueCondition.value),
+        priority: normalize(els.priority.value),
+        comment: normalize(els.comment.value),
+
         telegram_user: tg?.initDataUnsafe?.user || null
       };
+
+      const error = validateForm(payload);
+      if (error) {
+        showStatus(error, "error");
+        return;
+      }
 
       try {
         if (tg) {
           tg.sendData(JSON.stringify(payload));
-          showStatus("Заявка на выдачу отправлена в систему.", "ok");
+          showStatus("Форма выдачи отправлена в систему.", "ok");
           setTimeout(() => tg.close(), 1200);
         } else {
           showStatus("Telegram WebApp недоступен. Откройте форму из Telegram.", "error");
