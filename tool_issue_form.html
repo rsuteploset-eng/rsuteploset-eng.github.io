@@ -1,368 +1,636 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Выдача инструмента</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <style>
-        * { box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: #f5f7fa;
-            padding: 16px;
-            color: #1e2a1c;
-        }
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 16px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-            border: 1px solid #d7dfd4;
-        }
-        .header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-        .header img {
-            width: 56px;
-            height: 56px;
-            border-radius: 10px;
-            border: 1px solid #d7dfd4;
-            padding: 4px;
-        }
-        h2 {
-            font-size: 18px;
-            color: #213d1d;
-            margin: 0 0 12px 0;
-        }
-        label {
-            display: block;
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 4px;
-            color: #355d2f;
-        }
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #d7dfd4;
-            border-radius: 8px;
-            font-size: 16px;
-            background: #fafafa;
-            margin-bottom: 12px;
-        }
-        .row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        .item {
-            border: 1px dashed #bbb;
-            border-radius: 10px;
-            padding: 10px;
-            margin-bottom: 10px;
-            background: #fafafa;
-        }
-        .btn-secondary {
-            background: #ececec;
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            width: 100%;
-        }
-        .btn-danger {
-            background: #ffdede;
-            border: none;
-            padding: 8px;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-top: 8px;
-        }
-        .submit-btn {
-            width: 100%;
-            padding: 16px;
-            background: #355d2f;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: 700;
-            cursor: pointer;
-        }
-        .hidden { display: none; }
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #657064;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RSU-ERP v3 · Выдача инструмента</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root {
+      --primary: #2f5f4f;
+      --secondary: #1f3d33;
+      --accent: #d7b56d;
+      --bg: #f5f7f6;
+      --card: #ffffff;
+      --text: #1b1f1d;
+      --muted: #6b756f;
+      --border: #d8dfdb;
+      --danger: #a73737;
+      --ok: #2e7d4f;
+      --shadow: 0 10px 30px rgba(31, 61, 51, 0.08);
+      --radius: 18px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, sans-serif;
+    }
+
+    .page {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .hero {
+      display: flex;
+      gap: 14px;
+      align-items: center;
+      background: linear-gradient(135deg, var(--secondary), var(--primary));
+      color: #fff;
+      padding: 18px;
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+
+    .hero img {
+      width: 72px;
+      height: 72px;
+      object-fit: contain;
+      background: rgba(255,255,255,0.12);
+      border-radius: 14px;
+      padding: 6px;
+      flex-shrink: 0;
+    }
+
+    .hero-title {
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.15;
+    }
+
+    .hero-subtitle {
+      font-size: 13px;
+      opacity: 0.92;
+      margin-top: 4px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      margin: 0 0 12px 0;
+      font-size: 19px;
+      font-weight: 700;
+    }
+
+    .lead {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .step-badge {
+      display: inline-block;
+      margin-bottom: 10px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: #edf4f1;
+      color: var(--secondary);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field-inline {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .label {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .input,
+    .select,
+    .textarea {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      font-size: 15px;
+      background: #fff;
+      color: var(--text);
+      outline: none;
+    }
+
+    .input:focus,
+    .select:focus,
+    .textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(47,95,79,0.12);
+    }
+
+    .textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .summary {
+      display: grid;
+      gap: 10px;
+      background: #f8faf9;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 14px;
+      border-bottom: 1px dashed #dde6e1;
+      padding-bottom: 8px;
+    }
+
+    .summary-row:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .summary-key {
+      color: var(--muted);
+    }
+
+    .summary-value {
+      font-weight: 700;
+      text-align: right;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 8px;
+    }
+
+    .btn {
+      appearance: none;
+      border: none;
+      border-radius: 12px;
+      padding: 13px 18px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 700;
+      transition: 0.2s ease;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #244a3d;
+    }
+
+    .btn-secondary {
+      background: #edf2ef;
+      color: var(--text);
+    }
+
+    .status {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 12px;
+      display: none;
+      font-size: 14px;
+      line-height: 1.45;
+    }
+
+    .status.ok {
+      display: block;
+      background: #edf7f1;
+      border: 1px solid #c7e4d0;
+      color: var(--ok);
+    }
+
+    .status.error {
+      display: block;
+      background: #fff1f1;
+      border: 1px solid #f1c5c5;
+      color: var(--danger);
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      padding: 8px 0 20px 0;
+    }
+
+    @media (max-width: 700px) {
+      .field-inline {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        align-items: flex-start;
+      }
+
+      .hero img {
+        width: 62px;
+        height: 62px;
+      }
+
+      .hero-title {
+        font-size: 21px;
+      }
+
+      .summary-row {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .summary-value {
+        text-align: left;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="card header">
-        <img src="data:image/png;base64,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" />
-        <div>
-            <h2>Минрайтеплосеть</h2>
-            <p style="color:#657064;">РСУ • Выдача инструмента</p>
+  <div class="page">
+    <div class="hero">
+      <img src="./logo.png" alt="Логотип">
+      <div>
+        <div class="hero-title">RSU-ERP v3 · Выдача инструмента</div>
+        <div class="hero-subtitle">
+          Оформление ответственной выдачи инструмента, инвентаря и оборудования
         </div>
+      </div>
     </div>
 
-    <div id="loading" class="loading">Загрузка списка сотрудников...</div>
-    <form id="issueForm" style="display: none;">
-        <div class="card">
-            <label>Тип получателя</label>
-            <select id="recipientType" required>
-                <option value="brigadier">Своя бригада / бригадир</option>
-                <option value="other_department">Другое подразделение</option>
-                <option value="department_head">Начальник / ответственный</option>
-                <option value="responsible_person">Конкретный ответственный</option>
+    <div class="card">
+      <div class="section-title">Что делает эта форма</div>
+      <p class="lead">
+        Здесь оформляется подтверждённая выдача инструмента ответственным лицом.
+        Форма фиксирует получателя, объект, причину выдачи, состояние инструмента
+        и плановую дату возврата.
+      </p>
+    </div>
+
+    <form id="issueForm">
+      <div class="card">
+        <div class="step-badge">Шаг 1</div>
+        <div class="section-title">Кто оформляет выдачу</div>
+        <div class="grid">
+          <div class="field">
+            <label class="label" for="issuerName">Ответственное лицо</label>
+            <input class="input" id="issuerName" name="issuerName" type="text" placeholder="Например: Начальник РСУ" />
+            <div class="hint">
+              Сейчас это поле заполняется вручную для MVP. Позже будет подтягиваться автоматически из Telegram-профиля и роли.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="step-badge">Шаг 2</div>
+        <div class="section-title">Кому выдаётся инструмент</div>
+        <div class="grid">
+          <div class="field">
+            <label class="label" for="recipientType">Тип получателя</label>
+            <select class="select" id="recipientType" name="recipientType" required>
+              <option value="">Выберите тип</option>
+              <option value="Пользователь">Пользователь</option>
+              <option value="Бригада">Бригада</option>
+              <option value="Объект">Объект</option>
+              <option value="Аварийная группа">Аварийная группа</option>
             </select>
+          </div>
 
-            <label>Получатель (выберите из списка)</label>
-            <select id="recipientSelect" required>
-                <option value="">Загрузка...</option>
-            </select>
-            <input type="hidden" id="recipientId">
-
-            <label>Подразделение получателя</label>
-            <select id="recipientDepartment" required>
-                <option value="">Выбери</option>
-                <option>Теплотрасса</option>
-                <option>Отделочники</option>
-                <option>Котельные</option>
-                <option>Фасад</option>
-                <option>АДС</option>
-                <option>Другое подразделение</option>
-            </select>
-
-            <label>Объект</label>
-            <input id="objectName" placeholder="Напр: Теплотрасса ул. Ленина" required>
-
-            <div class="row">
-                <div>
-                    <label>Дата выдачи</label>
-                    <input type="date" id="issuedAt" required>
-                </div>
-                <div>
-                    <label>Срок возврата</label>
-                    <input type="date" id="dueDate" required>
-                </div>
+          <div class="field-inline">
+            <div class="field">
+              <label class="label" for="recipientName">Получатель</label>
+              <input class="input" id="recipientName" name="recipientName" type="text" placeholder="Например: Иванов Иван Александрович / Бригада Заславль" required />
             </div>
 
-            <label>Комментарий</label>
-            <textarea id="issueComment" placeholder="Напр: На монтаж и сварку"></textarea>
+            <div class="field">
+              <label class="label" for="recipientRole">Роль / уточнение</label>
+              <input class="input" id="recipientRole" name="recipientRole" type="text" placeholder="Например: Работник / Водитель / Бригадир" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="step-badge">Шаг 3</div>
+        <div class="section-title">Объект и инструмент</div>
+        <div class="grid">
+          <div class="field">
+            <label class="label" for="siteName">Объект</label>
+            <input class="input" id="siteName" name="siteName" type="text" placeholder="Например: Теплотрасса Бровки" required />
+            <div class="hint">
+              На следующем этапе здесь будет умный выбор из существующих объектов и защита от дублей.
+            </div>
+          </div>
+
+          <div class="field-inline">
+            <div class="field">
+              <label class="label" for="toolName">Инструмент / инвентарь</label>
+              <input class="input" id="toolName" name="toolName" type="text" placeholder="Например: Перфоратор Bosch" required />
+            </div>
+
+            <div class="field">
+              <label class="label" for="inventoryNo">Инвентарный номер</label>
+              <input class="input" id="inventoryNo" name="inventoryNo" type="text" placeholder="Например: INV-00125" required />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="step-badge">Шаг 4</div>
+        <div class="section-title">Условия выдачи</div>
+        <div class="grid">
+          <div class="field-inline">
+            <div class="field">
+              <label class="label" for="issueReason">Причина выдачи</label>
+              <select class="select" id="issueReason" name="issueReason" required>
+                <option value="">Выберите причину</option>
+                <option value="Работа на объекте">Работа на объекте</option>
+                <option value="Аварийный выезд">Аварийный выезд</option>
+                <option value="Временное использование">Временное использование</option>
+                <option value="Для бригады">Для бригады</option>
+                <option value="Перевозка / сопровождение">Перевозка / сопровождение</option>
+                <option value="Проверка / диагностика">Проверка / диагностика</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="label" for="plannedReturnDate">Плановая дата возврата</label>
+              <input class="input" id="plannedReturnDate" name="plannedReturnDate" type="date" />
+            </div>
+          </div>
+
+          <div class="field-inline">
+            <div class="field">
+              <label class="label" for="issueCondition">Состояние при выдаче</label>
+              <select class="select" id="issueCondition" name="issueCondition" required>
+                <option value="">Выберите состояние</option>
+                <option value="Исправен">Исправен</option>
+                <option value="Исправен, есть замечания">Исправен, есть замечания</option>
+                <option value="Некомплект">Некомплект</option>
+                <option value="Требует внимания">Требует внимания</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label class="label" for="priority">Приоритет</label>
+              <select class="select" id="priority" name="priority">
+                <option value="Обычный">Обычный</option>
+                <option value="Срочный">Срочный</option>
+                <option value="Аварийный">Аварийный</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="label" for="comment">Комментарий</label>
+            <textarea class="textarea" id="comment" name="comment" placeholder="Например: выдан под аварийный выезд, вернуть после завершения работ"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="step-badge">Шаг 5</div>
+        <div class="section-title">Подтверждение</div>
+        <div class="summary" id="summaryBox">
+          <div class="summary-row">
+            <div class="summary-key">Ответственное лицо</div>
+            <div class="summary-value" id="sumIssuer">—</div>
+          </div>
+          <div class="summary-row">
+            <div class="summary-key">Тип получателя</div>
+            <div class="summary-value" id="sumRecipientType">—</div>
+          </div>
+          <div class="summary-row">
+            <div class="summary-key">Получатель</div>
+            <div class="summary-value" id="sumRecipient">—</div>
+          </div>
+          <div class="summary-row">
+            <div class="summary-key">Объект</div>
+            <div class="summary-value" id="sumSite">—</div>
+          </div>
+          <div class="summary-row">
+            <div class="summary-key">Инструмент</div>
+            <div class="summary-value" id="sumTool">—</div>
+          </div>
+          <div class="summary-row">
+            <div class="summary-key">Причина</div>
+            <div class="summary-value" id="sumReason">—</div>
+          </div>
+          <div class="summary-row">
+            <div class="summary-key">Плановый возврат</div>
+            <div class="summary-value" id="sumReturnDate">—</div>
+          </div>
+          <div class="summary-row">
+            <div class="summary-key">Состояние при выдаче</div>
+            <div class="summary-value" id="sumCondition">—</div>
+          </div>
         </div>
 
-        <div class="card">
-            <h2>Состав выдачи</h2>
-            <div id="itemsContainer"></div>
-            <button type="button" class="btn-secondary" onclick="addIssueItem()">+ Добавить позицию</button>
+        <div class="actions">
+          <button class="btn btn-primary" type="submit">✅ Подтвердить выдачу</button>
+          <button class="btn btn-secondary" type="button" id="closeBtn">Закрыть</button>
         </div>
 
-        <button type="submit" class="submit-btn">Оформить выдачу</button>
+        <div id="statusBox" class="status"></div>
+      </div>
     </form>
 
-    <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-        tg.ready();
+    <div class="footer">
+      RSU-ERP v3 · Контур выдачи инструмента MVP 1.0
+    </div>
+  </div>
 
-        let users = [];
+  <script>
+    const tg = window.Telegram?.WebApp;
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
 
-        tg.sendData(JSON.stringify({ type: "get_users_list" }));
+    const form = document.getElementById("issueForm");
+    const statusBox = document.getElementById("statusBox");
+    const closeBtn = document.getElementById("closeBtn");
 
-        tg.onEvent('message', (event) => {
-            try {
-                const data = JSON.parse(event.data);
-                if (data.type === "users_list") {
-                    users = data.users;
-                    populateUsers();
-                }
-            } catch (e) {
-                console.error('Ошибка парсинга ответа:', e);
-            }
-        });
+    const fields = {
+      issuerName: document.getElementById("issuerName"),
+      recipientType: document.getElementById("recipientType"),
+      recipientName: document.getElementById("recipientName"),
+      recipientRole: document.getElementById("recipientRole"),
+      siteName: document.getElementById("siteName"),
+      toolName: document.getElementById("toolName"),
+      inventoryNo: document.getElementById("inventoryNo"),
+      issueReason: document.getElementById("issueReason"),
+      plannedReturnDate: document.getElementById("plannedReturnDate"),
+      issueCondition: document.getElementById("issueCondition"),
+      priority: document.getElementById("priority"),
+      comment: document.getElementById("comment"),
+    };
 
-        function populateUsers() {
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('issueForm').style.display = 'block';
-            const select = document.getElementById('recipientSelect');
-            select.innerHTML = '<option value="">Выберите получателя</option>';
-            users.forEach(u => {
-                const option = document.createElement('option');
-                option.value = u.id;      // Telegram ID
-                option.textContent = u.name; // полное ФИО
-                select.appendChild(option);
-            });
+    const summary = {
+      issuer: document.getElementById("sumIssuer"),
+      recipientType: document.getElementById("sumRecipientType"),
+      recipient: document.getElementById("sumRecipient"),
+      site: document.getElementById("sumSite"),
+      tool: document.getElementById("sumTool"),
+      reason: document.getElementById("sumReason"),
+      returnDate: document.getElementById("sumReturnDate"),
+      condition: document.getElementById("sumCondition"),
+    };
+
+    function normalize(value) {
+      return (value || "").replace(/\s+/g, " ").trim();
+    }
+
+    function showStatus(message, type = "ok") {
+      statusBox.className = "status " + type;
+      statusBox.textContent = message;
+    }
+
+    function refreshSummary() {
+      const toolText = [normalize(fields.toolName.value), normalize(fields.inventoryNo.value)]
+        .filter(Boolean)
+        .join(" · ");
+
+      const recipientText = [normalize(fields.recipientName.value), normalize(fields.recipientRole.value)]
+        .filter(Boolean)
+        .join(" · ");
+
+      summary.issuer.textContent = normalize(fields.issuerName.value) || "—";
+      summary.recipientType.textContent = normalize(fields.recipientType.value) || "—";
+      summary.recipient.textContent = recipientText || "—";
+      summary.site.textContent = normalize(fields.siteName.value) || "—";
+      summary.tool.textContent = toolText || "—";
+      summary.reason.textContent = normalize(fields.issueReason.value) || "—";
+      summary.returnDate.textContent = normalize(fields.plannedReturnDate.value) || "—";
+      summary.condition.textContent = normalize(fields.issueCondition.value) || "—";
+    }
+
+    Object.values(fields).forEach((field) => {
+      field.addEventListener("input", refreshSummary);
+      field.addEventListener("change", refreshSummary);
+    });
+
+    refreshSummary();
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+
+      const issuerName = normalize(fields.issuerName.value);
+      const recipientType = normalize(fields.recipientType.value);
+      const recipientName = normalize(fields.recipientName.value);
+      const recipientRole = normalize(fields.recipientRole.value);
+      const siteName = normalize(fields.siteName.value);
+      const toolName = normalize(fields.toolName.value);
+      const inventoryNo = normalize(fields.inventoryNo.value);
+      const issueReason = normalize(fields.issueReason.value);
+      const plannedReturnDate = normalize(fields.plannedReturnDate.value);
+      const issueCondition = normalize(fields.issueCondition.value);
+      const priority = normalize(fields.priority.value);
+      const comment = normalize(fields.comment.value);
+
+      if (!recipientType) {
+        showStatus("Выберите тип получателя.", "error");
+        return;
+      }
+
+      if (!recipientName) {
+        showStatus("Укажите получателя.", "error");
+        return;
+      }
+
+      if (!siteName) {
+        showStatus("Укажите объект.", "error");
+        return;
+      }
+
+      if (!toolName) {
+        showStatus("Укажите инструмент.", "error");
+        return;
+      }
+
+      if (!inventoryNo) {
+        showStatus("Укажите инвентарный номер.", "error");
+        return;
+      }
+
+      if (!issueReason) {
+        showStatus("Укажите причину выдачи.", "error");
+        return;
+      }
+
+      if (!issueCondition) {
+        showStatus("Укажите состояние при выдаче.", "error");
+        return;
+      }
+
+      const payload = {
+        action: "tool_issue_request",
+        issuer_name: issuerName,
+        recipient_type: recipientType,
+        recipient_name: recipientName,
+        recipient_role: recipientRole,
+        site_name: siteName,
+        tool_name: toolName,
+        inventory_no: inventoryNo,
+        issue_reason: issueReason,
+        planned_return_date: plannedReturnDate,
+        issue_condition: issueCondition,
+        priority: priority,
+        comment: comment,
+        telegram_user: tg?.initDataUnsafe?.user || null
+      };
+
+      try {
+        if (tg) {
+          tg.sendData(JSON.stringify(payload));
+          showStatus("Заявка на выдачу отправлена в систему.", "ok");
+          setTimeout(() => tg.close(), 1200);
+        } else {
+          showStatus("Telegram WebApp недоступен. Откройте форму из Telegram.", "error");
         }
+      } catch (err) {
+        showStatus("Не удалось отправить данные. Попробуйте ещё раз.", "error");
+      }
+    });
 
-        document.getElementById('recipientSelect').addEventListener('change', function() {
-            const selectedId = this.value;
-            const selectedUser = users.find(u => u.id === selectedId);
-            document.getElementById('recipientId').value = selectedId;
-            // создаём скрытое поле для имени, если его нет
-            if (!document.getElementById('recipientName')) {
-                const input = document.createElement('input');
-                input.type = 'hidden';
-                input.id = 'recipientName';
-                input.name = 'recipientName';
-                document.getElementById('issueForm').appendChild(input);
-            }
-            document.getElementById('recipientName').value = selectedUser ? selectedUser.name : '';
-        });
-
-        const CATEGORIES = ["Электроинструмент","Ручной инструмент","Леса","Лестницы / вышки","Удлинители","Насосы","Сварочное","Прочее"];
-        const ACCOUNTING_TYPES = [
-            { value: "instance", label: "Поэкземплярный" },
-            { value: "kit", label: "Комплект" },
-            { value: "quantity", label: "Количеством" }
-        ];
-        const UNITS = ["шт", "компл", "м", "м²", "м³"];
-
-        function setToday(){
-            const today = new Date().toISOString().split("T")[0];
-            document.getElementById("issuedAt").value = today;
-        }
-
-        function createSelect(options, placeholder = "Выбери") {
-            const s = document.createElement("select");
-            const o0 = document.createElement("option");
-            o0.value = "";
-            o0.textContent = placeholder;
-            s.appendChild(o0);
-            options.forEach(opt => {
-                const o = document.createElement("option");
-                if (typeof opt === "string") {
-                    o.value = opt;
-                    o.textContent = opt;
-                } else {
-                    o.value = opt.value;
-                    o.textContent = opt.label;
-                }
-                s.appendChild(o);
-            });
-            return s;
-        }
-
-        function addIssueItem() {
-            const container = document.getElementById("itemsContainer");
-            const item = document.createElement("div");
-            item.className = "item";
-            item.innerHTML = `
-                <label>Категория</label>
-                <div class="categoryWrap"></div>
-                <label>Название позиции</label>
-                <input class="item-name" placeholder="Напр: Перфоратор Makita 2470" />
-                <div class="row">
-                    <div>
-                        <label>Тип учёта</label>
-                        <div class="accountingWrap"></div>
-                    </div>
-                    <div>
-                        <label>Ед. изм.</label>
-                        <div class="unitWrap"></div>
-                    </div>
-                </div>
-                <div class="asset-id-wrap hidden">
-                    <label>ID экземпляра / инвентарный номер</label>
-                    <input class="asset-id" placeholder="Напр: AST-001" />
-                </div>
-                <div class="row">
-                    <div>
-                        <label>Количество</label>
-                        <input type="number" min="1" step="1" class="item-qty" value="1" />
-                    </div>
-                    <div>
-                        <label>Возвратное?</label>
-                        <select class="returnable">
-                            <option value="yes">Да</option>
-                            <option value="no">Нет</option>
-                        </select>
-                    </div>
-                </div>
-                <label>Комментарий</label>
-                <input class="item-comment" placeholder="Напр: Исправен" />
-                <button type="button" class="btn-danger">Удалить</button>
-            `;
-
-            item.querySelector(".categoryWrap").appendChild(createSelect(CATEGORIES));
-            item.querySelector(".accountingWrap").appendChild(createSelect(ACCOUNTING_TYPES));
-            item.querySelector(".unitWrap").appendChild(createSelect(UNITS));
-
-            item.querySelector(".accounting-type").addEventListener("change", function() {
-                const wrap = item.querySelector(".asset-id-wrap");
-                const qty = item.querySelector(".item-qty");
-                if (this.value === "instance") {
-                    wrap.classList.remove("hidden");
-                    qty.value = 1;
-                    qty.setAttribute("readonly", "readonly");
-                } else {
-                    wrap.classList.add("hidden");
-                    qty.removeAttribute("readonly");
-                }
-            });
-
-            item.querySelector(".btn-danger").addEventListener("click", () => item.remove());
-            container.appendChild(item);
-        }
-
-        function collectItems() {
-            return [...document.querySelectorAll("#itemsContainer .item")].map(item => {
-                const accountingType = item.querySelector(".accounting-type").value;
-                const qtyRaw = item.querySelector(".item-qty").value;
-                const qty = Number(qtyRaw || 0);
-                return {
-                    category: item.querySelector(".item-category").value,
-                    item_name: item.querySelector(".item-name").value.trim(),
-                    accounting_type: accountingType,
-                    asset_id: accountingType === "instance" ? item.querySelector(".asset-id").value.trim() : "",
-                    quantity: qty,
-                    unit: item.querySelector(".item-unit").value,
-                    returnable: item.querySelector(".returnable").value,
-                    comment: item.querySelector(".item-comment").value.trim()
-                };
-            }).filter(x => x.item_name || x.asset_id || x.quantity > 0);
-        }
-
-        document.getElementById("issueForm").addEventListener("submit", function(e) {
-            e.preventDefault();
-
-            const items = collectItems();
-            if (items.length === 0) {
-                tg.showAlert("Добавь хотя бы одну позицию.");
-                return;
-            }
-
-            const recipientSelect = document.getElementById("recipientSelect");
-            if (!recipientSelect.value) {
-                tg.showAlert("Выбери получателя.");
-                return;
-            }
-
-            const payload = {
-                issue_type: "tool_issue_v1",
-                issued_at: document.getElementById("issuedAt").value,
-                issuer_id: String(tg.initDataUnsafe?.user?.id || ""),
-                recipient_id: recipientSelect.value,
-                recipient_name: document.getElementById("recipientName")?.value || "",
-                recipient_type: document.getElementById("recipientType").value,
-                recipient_department: document.getElementById("recipientDepartment").value,
-                object_name: document.getElementById("objectName").value.trim(),
-                due_date: document.getElementById("dueDate").value,
-                comment: document.getElementById("issueComment").value.trim(),
-                items: items
-            };
-
-            tg.sendData(JSON.stringify(payload));
-            tg.close();
-        });
-
-        setToday();
-        addIssueItem();
-    </script>
+    closeBtn.addEventListener("click", () => {
+      if (tg) tg.close();
+    });
+  </script>
 </body>
 </html>
