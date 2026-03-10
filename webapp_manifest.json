@@ -34,6 +34,16 @@
       "путь_публикации": "branding.js"
     },
     {
+      "asset_type": "dependency",
+      "route_code": "premium_submission",
+      "source_path": "C:\\Users\\Laptop\\OneDrive\\Desktop\\rsu_erp_v3_skeleton\\webapp\\premium_catalogs.js",
+      "published_path": "premium_catalogs.js",
+      "тип": "dependency",
+      "код": "premium_submission",
+      "источник": "C:\\Users\\Laptop\\OneDrive\\Desktop\\rsu_erp_v3_skeleton\\webapp\\premium_catalogs.js",
+      "путь_публикации": "premium_catalogs.js"
+    },
+    {
       "asset_type": "page",
       "route_code": "premium_submission",
       "source_path": "C:\\Users\\Laptop\\OneDrive\\Desktop\\rsu_erp_v3_skeleton\\webapp\\premiums.html",

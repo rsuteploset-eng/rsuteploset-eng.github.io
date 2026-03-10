@@ -105,6 +105,41 @@ body {
   gap: 12px;
 }
 
+.rsu-grid-2,
+.rsu-grid-3,
+.rsu-grid-4 {
+  display: grid;
+  gap: 12px;
+}
+
+.rsu-grid-2 {
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.rsu-grid-3 {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.rsu-grid-4 {
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.rsu-stack {
+  display: grid;
+  gap: 12px;
+}
+
+.rsu-step-badge {
+  display: inline-block;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #edf4f1;
+  color: var(--rsu-secondary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
 .rsu-label {
   display: block;
   margin-bottom: 6px;
@@ -135,6 +170,196 @@ body {
 .rsu-textarea {
   min-height: 100px;
   resize: vertical;
+}
+
+.rsu-input[readonly],
+.rsu-select[disabled] {
+  background: #f5f7f6;
+  color: var(--rsu-muted);
+}
+
+.rsu-field-meta {
+  margin-top: 6px;
+  color: var(--rsu-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.rsu-helper {
+  padding: 12px 14px;
+  border: 1px dashed var(--rsu-border);
+  border-radius: 12px;
+  background: #f8faf9;
+  color: var(--rsu-muted);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.rsu-helper strong {
+  color: var(--rsu-text);
+}
+
+.rsu-service-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #eef2f0;
+  color: var(--rsu-secondary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.rsu-chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rsu-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 9px 14px;
+  border: 1px solid var(--rsu-border);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--rsu-text);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.rsu-chip.is-active {
+  border-color: var(--rsu-primary);
+  background: linear-gradient(135deg, #f0f6f3, #ffffff);
+  color: var(--rsu-secondary);
+  box-shadow: 0 8px 20px rgba(47, 95, 79, 0.08);
+}
+
+.rsu-chip input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.rsu-summary {
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px solid var(--rsu-border);
+  background: #f8faf9;
+}
+
+.rsu-summary-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px dashed #dde6e1;
+  font-size: 14px;
+}
+
+.rsu-summary-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.rsu-summary-key {
+  color: var(--rsu-muted);
+}
+
+.rsu-summary-value {
+  font-weight: 700;
+  text-align: right;
+}
+
+.rsu-inline-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.rsu-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: #eef4f1;
+  color: var(--rsu-secondary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.rsu-repeatable-list {
+  display: grid;
+  gap: 12px;
+}
+
+.rsu-subcard {
+  padding: 14px;
+  border: 1px solid var(--rsu-border);
+  border-radius: 14px;
+  background: #fbfcfb;
+}
+
+.rsu-subcard-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.rsu-subcard-title {
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.rsu-subtle-divider {
+  height: 1px;
+  margin: 4px 0;
+  background: linear-gradient(90deg, rgba(216, 223, 219, 0.1), rgba(216, 223, 219, 1), rgba(216, 223, 219, 0.1));
+}
+
+.rsu-empty {
+  padding: 14px;
+  border: 1px dashed var(--rsu-border);
+  border-radius: 14px;
+  color: var(--rsu-muted);
+  font-size: 13px;
+  background: #fafcfb;
+}
+
+.rsu-toggle-line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid var(--rsu-border);
+  border-radius: 12px;
+  background: #fff;
+  color: var(--rsu-text);
+  font-size: 14px;
+}
+
+.rsu-toggle-line input {
+  width: auto;
+  margin: 0;
+}
+
+.rsu-kv {
+  display: grid;
+  gap: 6px;
+}
+
+.rsu-kv strong {
+  font-size: 14px;
 }
 
 .rsu-actions {
@@ -215,5 +440,14 @@ body {
 
   .rsu-title {
     font-size: 19px;
+  }
+
+  .rsu-summary-row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .rsu-summary-value {
+    text-align: left;
   }
 }

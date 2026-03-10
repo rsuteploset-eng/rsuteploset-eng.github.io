@@ -28,6 +28,74 @@
   }
 
   window.RSU_UI = {
+    normalizeText(value) {
+      return String(value || "").replace(/\s+/g, " ").trim();
+    },
+
+    humanize(value) {
+      return this.normalizeText(value).replace(/_/g, " ");
+    },
+
+    stepBadge(text) {
+      return `<div class="rsu-step-badge">${text}</div>`;
+    },
+
+    helper(text) {
+      return `<div class="rsu-helper">${text}</div>`;
+    },
+
+    renderTags(items) {
+      const values = (items || []).filter(Boolean);
+      if (!values.length) {
+        return '<span class="rsu-tag">Нет данных</span>';
+      }
+      return values.map((item) => `<span class="rsu-tag">${item}</span>`).join("");
+    },
+
+    renderSummary(rows) {
+      const items = (rows || []).map((row) => `
+        <div class="rsu-summary-row">
+          <div class="rsu-summary-key">${row.label || ""}</div>
+          <div class="rsu-summary-value">${row.value || "—"}</div>
+        </div>
+      `).join("");
+      return `<div class="rsu-summary">${items}</div>`;
+    },
+
+    setSelectOptions(select, options, { placeholder = "Выберите", selectedValue = "" } = {}) {
+      if (!select) return;
+      const rows = [`<option value="">${placeholder}</option>`];
+      (options || []).forEach((option) => {
+        const value = String(option.value ?? "");
+        const label = String(option.label ?? value);
+        const selected = String(selectedValue) === value ? " selected" : "";
+        rows.push(`<option value="${value}"${selected}>${label}</option>`);
+      });
+      select.innerHTML = rows.join("");
+    },
+
+    bindChipGroup(container, { value, onChange } = {}) {
+      if (!container) return;
+      const buttons = Array.from(container.querySelectorAll("[data-value]"));
+      const sync = (nextValue) => {
+        buttons.forEach((button) => {
+          button.classList.toggle("is-active", button.dataset.value === nextValue);
+        });
+      };
+
+      buttons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const nextValue = button.dataset.value || "";
+          sync(nextValue);
+          if (typeof onChange === "function") {
+            onChange(nextValue);
+          }
+        });
+      });
+
+      sync(value || buttons[0]?.dataset.value || "");
+    },
+
     applyBrandingCss() {
       const branding = ensureBranding();
       if (!branding) return;
