@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RSU ERP v3 · Премии</title>
+  <link rel="stylesheet" href="./base.css">
+  <style>
+    .premium-grid {
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    }
+
+    .premium-rows {
+      display: grid;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .premium-subrow {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border: 1px solid var(--rsu-border);
+      border-radius: 14px;
+      background: #fbfcfb;
+    }
+
+    .premium-check {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: var(--rsu-muted);
+    }
+
+    .premium-debug {
+      display: none;
+      background: #17211d;
+      color: #d9efe3;
+      border-radius: 14px;
+      padding: 14px;
+      overflow: auto;
+    }
+
+    @media (max-width: 600px) {
+      .premium-subrow {
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="./branding.js"></script>
+  <script src="./base_ui.js"></script>
+  <script src="./premiums.js"></script>
+</body>
+</html>

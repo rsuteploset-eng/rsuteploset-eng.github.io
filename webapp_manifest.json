@@ -1,0 +1,105 @@
+{
+  "site_root_url": "https://rsuteploset-eng.github.io",
+  "generated_from": "C:\\Users\\Laptop\\OneDrive\\Desktop\\rsu_erp_v3_skeleton",
+  "output_dir": "C:\\Users\\Laptop\\OneDrive\\Desktop\\rsu_erp_v3_skeleton\\exports\\github_pages_root",
+  "copied_files": [
+    {
+      "asset_type": "dependency",
+      "route_code": "premium_submission",
+      "source_path": "C:\\Users\\Laptop\\OneDrive\\Desktop\\rsu_erp_v3_skeleton\\webapp\\base.css",
+      "published_path": "base.css",
+      "тип": "dependency",
+      "код": "premium_submission",
+      "источник": "C:\\Users\\Laptop\\OneDrive\\Desktop\\rsu_erp_v3_skeleton\\webapp\\base.css",
+      "путь_публикации": "base.css"
+    },
+    {
+      "asset_type": "dependency",
+      "route_code": "premium_submission",
+      "source_path": "C:\\Users\\Laptop\\OneDrive\\Desktop\\rsu_erp_v3_skeleton\\webapp\\base_ui.js",
+      "published_path": "base_ui.js",
+      "тип": "dependency",
+      "код": "premium_submission",
+      "источник": "C:\\Users\\Laptop\\OneDrive\\Desktop\\rsu_erp_v3_skeleton\\webapp\\base_ui.js",
+      "путь_публикации": "base_ui.js"
+    },
+    {
+      "asset_type": "dependency",
+      "route_code": "premium_submission",
+      "source_path": "C:\\Users\\Laptop\\OneDrive\\Desktop\\rsu_erp_v3_skeleton\\webapp\\branding.js",
+      "published_path": "branding.js",
+      "тип": "dependency",
+      "код": "premium_submission",
+      "источник": "C:\\Users\\Laptop\\OneDrive\\Desktop\\rsu_erp_v3_skeleton\\webapp\\branding.js",
+      "путь_публикации": "branding.js"
+    },
+    {
+      "asset_type": "page",
+      "route_code": "premium_submission",
+      "source_path": "C:\\Users\\Laptop\\OneDrive\\Desktop\\rsu_erp_v3_skeleton\\webapp\\premiums.html",
+      "published_path": "premiums.html",
+      "тип": "page",
+      "код": "premium_submission",
+      "источник": "C:\\Users\\Laptop\\OneDrive\\Desktop\\rsu_erp_v3_skeleton\\webapp\\premiums.html",
+      "путь_публикации": "premiums.html"
+    },
+    {
+      "asset_type": "dependency",
+      "route_code": "premium_submission",
+      "source_path": "C:\\Users\\Laptop\\OneDrive\\Desktop\\rsu_erp_v3_skeleton\\webapp\\premiums.js",
+      "published_path": "premiums.js",
+      "тип": "dependency",
+      "код": "premium_submission",
+      "источник": "C:\\Users\\Laptop\\OneDrive\\Desktop\\rsu_erp_v3_skeleton\\webapp\\premiums.js",
+      "путь_публикации": "premiums.js"
+    }
+  ],
+  "missing_sources": [],
+  "routes": [
+    {
+      "route_code": "registration",
+      "title": "Регистрация",
+      "url": "https://rsuteploset-eng.github.io/reg_form.html",
+      "published_path": "reg_form.html",
+      "local_source_path": "",
+      "managed_in_this_repo": false,
+      "source_exists": false,
+      "код": "registration",
+      "название": "Регистрация",
+      "путь_публикации": "reg_form.html",
+      "локальный_источник": "",
+      "управляется_в_этом_репозитории": false,
+      "источник_существует": false
+    },
+    {
+      "route_code": "leadership_dashboard",
+      "title": "Панель руководства",
+      "url": "https://rsuteploset-eng.github.io/leadership_dashboard.html",
+      "published_path": "leadership_dashboard.html",
+      "local_source_path": "",
+      "managed_in_this_repo": false,
+      "source_exists": false,
+      "код": "leadership_dashboard",
+      "название": "Панель руководства",
+      "путь_публикации": "leadership_dashboard.html",
+      "локальный_источник": "",
+      "управляется_в_этом_репозитории": false,
+      "источник_существует": false
+    },
+    {
+      "route_code": "premium_submission",
+      "title": "Форма премии",
+      "url": "https://rsuteploset-eng.github.io/premiums.html",
+      "published_path": "premiums.html",
+      "local_source_path": "C:\\Users\\Laptop\\OneDrive\\Desktop\\rsu_erp_v3_skeleton\\webapp\\premiums.html",
+      "managed_in_this_repo": true,
+      "source_exists": true,
+      "код": "premium_submission",
+      "название": "Форма премии",
+      "путь_публикации": "premiums.html",
+      "локальный_источник": "C:\\Users\\Laptop\\OneDrive\\Desktop\\rsu_erp_v3_skeleton\\webapp\\premiums.html",
+      "управляется_в_этом_репозитории": true,
+      "источник_существует": true
+    }
+  ]
+}
